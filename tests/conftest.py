@@ -197,8 +197,8 @@ def strategy(strategist, keeper, vault, Strategy, gov, cToken, spookyrouter, scr
 
 
 @pytest.fixture
-def factory(LevCompFactory, vault, cToken, strategist, gov, spookyrouter, scream, screamComptroller, wet):
-    factory = strategist.deploy(LevCompFactory, vault, cToken,spookyrouter, scream, screamComptroller, wet)
+def factory(LevCompFactory, vault, cToken, strategist, gov, spookyrouter, scream, screamComptroller, weth):
+    factory = strategist.deploy(LevCompFactory, vault, cToken,spookyrouter, scream, screamComptroller, weth)
     yield factory
 
 
