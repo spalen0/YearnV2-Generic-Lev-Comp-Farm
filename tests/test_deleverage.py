@@ -21,7 +21,7 @@ def test_large_deleverage_to_zero(
 
     vault.revokeStrategy(strategy.address, {"from": gov})
     n = 0
-    while vault.debtOutstanding(strategy) > strategy.minWant() and n < 6:
+    while vault.debtOutstanding(strategy) > strategy.minWant() and n < 10:
         utils.sleep(1)
         chain.mine(5)
         print(f"Iteration: {n}")
