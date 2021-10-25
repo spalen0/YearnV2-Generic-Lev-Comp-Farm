@@ -49,6 +49,8 @@ contract Strategy is BaseStrategy {
     bool public dontClaimComp; // enable/disables COMP claiming
     uint256 public minCompToSell; // minimum amount of COMP to be sold
 
+    uint256 public iterations; //number of loops we do
+
     bool public forceMigrate;
     bool public fourThreeProtection;
 
@@ -87,6 +89,7 @@ contract Strategy is BaseStrategy {
         maxReportDelay = 86400; // once per 24 hours
         profitFactor = 100_000; // multiple before triggering harvest 
         debtThreshold = 1e30;
+        iterations = 6; //standard 6
 
         // set minWant to 1e-5 want
         minWant = uint256(uint256(10)**uint256((IERC20Extended(address(want))).decimals())).div(1e5);
@@ -121,6 +124,10 @@ contract Strategy is BaseStrategy {
 
     function setMinCompToSell(uint256 _minCompToSell) external management {
         minCompToSell = _minCompToSell;
+    }
+
+    function setIterations(uint256 _iterations) external management {
+        iterations = _iterations;
     }
 
     function setMinWant(uint256 _minWant) external management {
@@ -221,8 +228,7 @@ contract Strategy is BaseStrategy {
 
         uint256 supplyRate = cToken.supplyRatePerBlock();
 
-        uint256 collateralisedDeposit1 = deposits.mul(collateralFactorMantissa).div(1e18);
-        uint256 collateralisedDeposit = collateralisedDeposit1;
+        uint256 collateralisedDeposit = deposits.mul(collateralFactorMantissa).div(1e18);
 
         uint256 denom1 = borrows.mul(borrrowRate);
         uint256 denom2 = collateralisedDeposit.mul(supplyRate);
@@ -403,7 +409,7 @@ contract Strategy is BaseStrategy {
         uint256 i = 0;
         while (position > minWant) {
             position = position.sub(_noFlashLoan(position, deficit));
-            if (i >= 6) {
+            if (i >= iterations) {
                 break;
             }
             i++;
@@ -433,7 +439,7 @@ contract Strategy is BaseStrategy {
                 position = position.sub(_noFlashLoan(position, true));
                 i++;
                 //A limit set so we don't run out of gas
-                if (i >= 5) {
+                if (i >= iterations) {
                     notAll = true;
                     break;
                 }
