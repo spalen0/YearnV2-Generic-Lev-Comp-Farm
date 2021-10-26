@@ -52,7 +52,7 @@ contract Strategy is BaseStrategy {
     uint256 public iterations; //number of loops we do
 
     bool public forceMigrate;
-    bool public fourThreeProtection;
+    bool public withdrawChecks;
 
     bool public splitCompDistribution;
 
@@ -103,8 +103,8 @@ contract Strategy is BaseStrategy {
      * Control Functions
      */
 
-    function setFourThreeProtection(bool _fourThreeProtection) external management {
-        fourThreeProtection = _fourThreeProtection;
+    function setWithdrawChecks(bool _withdrawChecks) external management {
+        withdrawChecks = _withdrawChecks;
     }
 
     function setDontClaimComp(bool _dontClaimComp) external management {
@@ -569,7 +569,7 @@ contract Strategy is BaseStrategy {
             }
         }
 
-        if (fourThreeProtection) {
+        if (withdrawChecks) {
             require(_amountNeeded == _amountFreed.add(_loss)); // dev: fourThreeProtection
         }
     }
