@@ -10,6 +10,7 @@ def test_large_deleverage_to_zero(
     # Deposit to the vault and harvest
     actions.user_deposit(user, vault, token, amount)
     utils.sleep(1)
+    strategy.setMinCompToSell(1, {"from": gov})
     strategy.harvest({"from": strategist})
 
     assert pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX) == amount
