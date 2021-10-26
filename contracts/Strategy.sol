@@ -36,7 +36,7 @@ contract Strategy is BaseStrategy {
     address public weth;
     CErc20I public cToken;
 
-    uint256 private constant SECONDSPERBLOCK = 1; //1 for fantom. 13 for ethereum
+    uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum
 
     IUniswapV2Router02 public currentRouter; //uni v2 forks only
 
@@ -56,8 +56,8 @@ contract Strategy is BaseStrategy {
 
     bool public splitCompDistribution;
 
-    constructor(address _vault, address _cToken, address _router, address _comp, address _comptroller, address _weth) public BaseStrategy(_vault) {
-        _initializeThis(_cToken, _router, _comp, _comptroller, _weth);
+    constructor(address _vault, address _cToken, address _router, address _comp, address _comptroller, address _weth, uint256 _secondsPerBlock) public BaseStrategy(_vault) {
+        _initializeThis(_cToken, _router, _comp, _comptroller, _weth, _secondsPerBlock);
     }
 
     function approveTokenMax(address token, address spender) internal {
@@ -68,15 +68,16 @@ contract Strategy is BaseStrategy {
         return "GenLevCompV3NoFlash";
     }
 
-    function initialize(address _vault, address _cToken, address _router, address _comp, address _comptroller, address _weth) external {
+    function initialize(address _vault, address _cToken, address _router, address _comp, address _comptroller, address _weth, uint256 _secondsPerBlock) external {
         _initialize(_vault, msg.sender, msg.sender, msg.sender);
-        _initializeThis(_cToken, _router, _comp, _comptroller, _weth);
+        _initializeThis(_cToken, _router, _comp, _comptroller, _weth, _secondsPerBlock);
     }
 
-    function _initializeThis(address _cToken, address _router, address _comp, address _comptroller, address _weth) internal {
+    function _initializeThis(address _cToken, address _router, address _comp, address _comptroller, address _weth, uint256 _secondsPerBlock) internal {
         cToken = CErc20I(_cToken);
         comp = _comp;
         weth = _weth;
+        secondsPerBlock = _secondsPerBlock;
         compound = ComptrollerI(_comptroller);
         require(IERC20Extended(address(want)).decimals() <= 18); // dev: want not supported
         currentRouter = IUniswapV2Router02(_router);
@@ -127,6 +128,7 @@ contract Strategy is BaseStrategy {
     }
 
     function setIterations(uint256 _iterations) external management {
+        require(_iterations > 0 && _iterations <= 100);
         iterations = _iterations;
     }
 
@@ -286,7 +288,7 @@ contract Strategy is BaseStrategy {
 
         //last time we ran harvest
         uint256 lastReport = vault.strategies(address(this)).lastReport;
-        uint256 blocksSinceLast = (block.timestamp.sub(lastReport)).div(SECONDSPERBLOCK); 
+        uint256 blocksSinceLast = (block.timestamp.sub(lastReport)).div(secondsPerBlock); 
 
         return blocksSinceLast.mul(blockShare);
     }

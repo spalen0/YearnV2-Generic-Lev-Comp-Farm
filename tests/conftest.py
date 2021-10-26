@@ -190,7 +190,7 @@ def reentry_test(user, ReentryTest):
 
 @pytest.fixture
 def strategy(strategist, keeper, vault, Strategy, gov, cToken, spookyrouter, scream, screamComptroller, weth):
-    strategy = strategist.deploy(Strategy, vault, cToken,spookyrouter, scream, screamComptroller, weth)
+    strategy = strategist.deploy(Strategy, vault, cToken,spookyrouter, scream, screamComptroller, weth, 1)
     strategy.setKeeper(keeper)
     vault.addStrategy(strategy, 10_000, 0, 2 ** 256 - 1, 0, {"from": gov})
     yield strategy
@@ -198,7 +198,7 @@ def strategy(strategist, keeper, vault, Strategy, gov, cToken, spookyrouter, scr
 
 @pytest.fixture
 def factory(LevCompFactory, vault, cToken, strategist, gov, spookyrouter, scream, screamComptroller, weth):
-    factory = strategist.deploy(LevCompFactory, vault, cToken,spookyrouter, scream, screamComptroller, weth)
+    factory = strategist.deploy(LevCompFactory, vault, cToken,spookyrouter, scream, screamComptroller, weth, 1)
     yield factory
 
 
