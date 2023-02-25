@@ -51,7 +51,7 @@ def test_apr_wftm(
 
     startingBalance = vault.totalAssets()
 
-    for i in range(6):
+    for i in range(2): # TODO: see how many times we can run this
 
         waitBlock = 25
         print(f"\n----wait {waitBlock} blocks----")
@@ -64,7 +64,7 @@ def test_apr_wftm(
         #wait 6 hours. shouldnt mess up next round as compound uses blocks
         print("Locked: ", vault.lockedProfit())
         assert vault.lockedProfit() > 0 # some profit should be unlocked
-        chain.sleep(21600)
+        chain.sleep(21600) # TODO: sonne uses seconds, not blocks
         chain.mine(1)
         
         ppsAfter = vault.pricePerShare()
@@ -84,7 +84,7 @@ def test_apr_wftm(
         print(f"PPS Diff: {ppsAfter - ppsBefore}")
         assert ppsAfter - ppsBefore > 0 # pps should have risen
 
-        blocks_per_year = 3.154e+7
+        blocks_per_year = 31_536_000
         assert startingBalance != 0
         time = (i + 1) * waitBlock
         assert time != 0

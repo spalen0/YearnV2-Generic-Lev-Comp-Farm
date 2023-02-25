@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import {BaseStrategy, StrategyParams, VaultAPI} from "@yearnvaults/contracts/BaseStrategy.sol";
 
-import "./Interfaces/UniswapInterfaces/IUniswapV2Router02.sol";
+import "./Interfaces/Velodrome/IVelodromeRouter.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -28,6 +28,9 @@ contract Strategy is BaseStrategy {
     using Address for address;
     using SafeMath for uint256;
 
+    address private constant USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
+    address private constant SONNE = 0x1DB2466d9F5e10D7090E7152B68d62703a2245F0;
+
     // Comptroller address for compound.finance
     ComptrollerI public compound;
 
@@ -36,9 +39,9 @@ contract Strategy is BaseStrategy {
     address public weth;
     CErc20I public cToken;
 
-    uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum
+    uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum, Sonne uses 1
 
-    IUniswapV2Router02 public currentRouter; //uni v2 forks only
+    IVelodromeRouter public currentRouter; // velodrome router only
 
     uint256 public collateralTarget; // total borrow / total supply ratio we are targeting (100% = 1e18)
     uint256 private blocksToLiquidationDangerZone; // minimum number of blocks before liquidation
@@ -80,7 +83,7 @@ contract Strategy is BaseStrategy {
         secondsPerBlock = _secondsPerBlock;
         compound = ComptrollerI(_comptroller);
         require(IERC20Extended(address(want)).decimals() <= 18); // dev: want not supported
-        currentRouter = IUniswapV2Router02(_router);
+        currentRouter = IVelodromeRouter(_router);
 
         //pre-set approvals
         approveTokenMax(comp, address(currentRouter));
@@ -112,7 +115,7 @@ contract Strategy is BaseStrategy {
     }
 
     function setRouter(address _currentV2Router) external onlyGovernance {
-        currentRouter = IUniswapV2Router02(_currentV2Router);
+        currentRouter = IVelodromeRouter(_currentV2Router); // TODO: not verified in the test
     }
 
     function setForceMigrate(bool _force) external onlyGovernance {
@@ -595,16 +598,15 @@ contract Strategy is BaseStrategy {
 
     }
 
-    function getTokenOutPathV2(address _tokenIn, address _tokenOut) internal view returns (address[] memory _path) {
-        bool isWeth = _tokenIn == address(weth) || _tokenOut == address(weth);
-        _path = new address[](isWeth ? 2 : 3);
-        _path[0] = _tokenIn;
+    function getTokenOutPathV2(address _tokenIn, address _tokenOut) internal view returns (IVelodromeRouter.route[] memory _path) {
+        bool isUsdc = _tokenOut == USDC;
+        _path = new IVelodromeRouter.route[](isUsdc ? 1 : 2);
 
-        if (isWeth) {
-            _path[1] = _tokenOut;
+        if (isUsdc) {
+            _path[0] = IVelodromeRouter.route(_tokenIn, USDC, false);
         } else {
-            _path[1] = address(weth);
-            _path[2] = _tokenOut;
+            _path[0] = IVelodromeRouter.route(_tokenIn, USDC, false);
+            _path[1] = IVelodromeRouter.route(USDC, _tokenOut, false);
         }
     }
 

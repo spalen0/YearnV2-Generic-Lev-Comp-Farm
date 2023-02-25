@@ -18,13 +18,15 @@ def test_revoke_strategy_from_vault(
     # In order to pass this tests, you will need to implement prepareReturn.
     vault.revokeStrategy(strategy.address, {"from": gov})
     chain.sleep(1)
-    strategy.harvest({"from": gov})
+    tx = strategy.harvest({"from": gov})
     chain.sleep(1)
-    strategy.harvest()  # to return to vault
+    tx = strategy.harvest({"from": gov})
     utils.strategy_status(vault, strategy)
-    strategy.harvest()  # to return to vault
+    chain.sleep(1)
+    tx = strategy.harvest({"from": gov})
     utils.strategy_status(vault, strategy)
-    strategy.harvest()  
+    chain.sleep(1)
+    tx = strategy.harvest({"from": gov})
     utils.strategy_status(vault, strategy)
     assert pytest.approx(token.balanceOf(vault.address), rel=RELATIVE_APPROX) == amount
 
@@ -39,14 +41,14 @@ def test_revoke_strategy_from_strategy(
         {"from": gov},
     )
     chain.sleep(1)
-    strategy.harvest({"from": gov})
+    tx = strategy.harvest({"from": gov}) # TODO: see why this fails on function _withdrawSome
     assert pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX) == amount
 
     strategy.setEmergencyExit()
     chain.sleep(1)
-    strategy.harvest({"from": gov})
+    tx = strategy.harvest({"from": gov})
     chain.sleep(1)
-    strategy.harvest()  # to return to vault
+    tx = strategy.harvest({"from": gov})
     assert pytest.approx(token.balanceOf(vault.address), rel=RELATIVE_APPROX) == amount
 
 
@@ -59,7 +61,7 @@ def test_revoke_with_profit(
         {"from": gov},
     )
     chain.sleep(1)
-    strategy.harvest({"from": gov})
+    tx = strategy.harvest({"from": gov})
     assert pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX) == amount
 
     actions.generate_profit(strategy, 20)
@@ -68,7 +70,7 @@ def test_revoke_with_profit(
     # In order to pass this tests, you will need to implement prepareReturn.
     vault.revokeStrategy(strategy.address, {"from": gov})
     chain.sleep(1)
-    strategy.harvest({"from": gov})
+    tx = strategy.harvest({"from": gov})
     chain.sleep(1)
-    strategy.harvest()  # to return to vault
-    checks.check_revoked_strategy(vault, strategy)
+    tx = strategy.harvest({"from": gov})
+    assert pytest.approx(token.balanceOf(vault.address), rel=RELATIVE_APPROX) == amount

@@ -123,7 +123,7 @@ def test_sweep(gov, vault, strategy, token, user, amount, weth, weth_amount):
     assert weth.balanceOf(gov) == weth_amount + before_balance
 
 
-def test_triggers(chain, gov, vault, strategy, token, amount, user, strategist):
+def test_triggers(chain, gov, vault, strategy, token, amount, user, strategist, sonne_comptroller):
     # Deposit to the vault and harvest
     actions.user_deposit(user, vault, token, amount)
     chain.sleep(1)
@@ -136,11 +136,10 @@ def test_triggers(chain, gov, vault, strategy, token, amount, user, strategist):
 
     strategy.harvest()
 
-    compound = Contract("0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B")
     tx = strategy.setCollateralTarget(
-        compound.markets(strategy.cToken()).dict()["collateralFactorMantissa"] - 1000,
+        sonne_comptroller.markets(strategy.cToken())[1] - 1000,
         {"from": gov},
     )
     assert strategy.tendTrigger(1e15) == False
     strategy.harvest()
-    assert strategy.tendTrigger(1e15) == True
+    assert strategy.tendTrigger(1e15) == True # TODO: check this

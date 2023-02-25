@@ -22,12 +22,12 @@ def test_shutdown(chain, token, vault, strategy, amount, gov, user, RELATIVE_APP
     # Set debtRatio to 0, then harvest, check that accounting worked as expected
     vault.updateStrategyDebtRatio(strategy, 0, {"from": gov})
     strategy.setCollateralTarget(0.1 * 1e18, {"from": gov})
-    strategy.harvest({"from": gov})
+    tx = strategy.harvest({"from": gov})
     utils.sleep(1)
     chain.mine(5)
-    strategy.harvest({"from": gov})
+    tx = strategy.harvest({"from": gov}) # brownie.exceptions.VirtualMachineError: revert: IOA at Strategy.sol L628: uint256 exchangeRateStored = cToken.exchangeRateStored();
     utils.sleep()
-    strategy.harvest({"from": gov})
+    tx = strategy.harvest({"from": gov})
 
     status = vault.strategies(strategy).dict()
     utils.strategy_status(vault, strategy)

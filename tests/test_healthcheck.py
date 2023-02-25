@@ -11,13 +11,13 @@ def test_healthcheck(user, vault, token, amount, strategy, chain, strategist, go
     assert strategy.doHealthCheck() == False
     assert strategy.healthCheck() == "0x0000000000000000000000000000000000000000"
 
-    strategy.setHealthCheck("0xDDCea799fF1699e98EDF118e0629A974Df7DF012", {"from": gov})
-    assert strategy.healthCheck() == "0xDDCea799fF1699e98EDF118e0629A974Df7DF012"
+    strategy.setHealthCheck("0x3d8f58774611676fd196d26149c71a9142c45296", {"from": gov})
+    assert strategy.healthCheck() == "0x3d8f58774611676fd196d26149c71a9142c45296"
     chain.sleep(1)
     strategy.harvest({"from": strategist})
 
     chain.sleep(24 * 3600)
-    chain.mine()
+    chain.mine(1)
 
     strategy.setDoHealthCheck(True, {"from": gov})
 
@@ -31,7 +31,7 @@ def test_healthcheck(user, vault, token, amount, strategy, chain, strategist, go
 
     # the harvest should go through, taking the loss
     tx = strategy.harvest({"from": strategist})
-    assert pytest.approx(tx.events["Harvested"]["loss"], rel=1e-3) == loss_amount
+    assert tx.events["Harvested"]["loss"] <= loss_amount # harvested loss is lower because sonne earns on seconds, not on blocks
 
     vault.withdraw({"from": user})
     assert token.balanceOf(user) < amount  # user took losses

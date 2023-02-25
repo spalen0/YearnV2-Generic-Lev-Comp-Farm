@@ -50,18 +50,23 @@ def keeper(accounts):
 
 
 token_addresses = {
-    "WFTM": "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83",  # WFTM
-    
+    "USDT": "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
+    "DAI": "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+    "USDC": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
+    "OP": "0x4200000000000000000000000000000000000042",
+    "WBTC": "0x68f180fcce6836688e9084f035309e29bf0a2095",
+    "WETH": "0x4200000000000000000000000000000000000006",
 }
 
 # TODO: uncomment those tokens you want to test as want
 @pytest.fixture(
     params=[
-        'WFTM', # WBTC
-        # "YFI",  # YFI
-        # "WETH",  # WETH
-        # 'LINK', # LINK
-        # 'USDT', # USDT
+        "USDC",
+        # "USDT",
+        # "DAI",
+        # "OP", # check why it won't start
+        # "WBTC",
+        # "WETH",
     ],
     scope="session",
     autouse=True,
@@ -71,7 +76,12 @@ def token(interface, request):
 
 
 cToken_addresses = {
-    "WFTM": "0x5AA53f03197E08C4851CAD8C92c7922DA5857E5d"
+    "USDC": "0xEC8FEa79026FfEd168cCf5C627c7f486D77b765F",
+    "USDT": "0x5Ff29E4470799b982408130EFAaBdeeAE7f66a10",
+    "DAI": "0x5569b83de187375d43FBd747598bfe64fC8f6436",
+    "OP": "0x8cD6b19A07d754bF36AdEEE79EDF4F2134a8F571",
+    "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
+    "WETH": "0xf7B5965f5C117Eb1B5450187c9DcFccc3C317e8E",
 }
 
 
@@ -81,7 +91,12 @@ def cToken(token):
 
 
 whale_addresses = {
-    "WFTM": "0x39B3bd37208CBaDE74D0fcBDBb12D606295b430a" #geist
+    "USDC": "0xebe80f029b1c02862b9e8a70a7e5317c06f62cae",
+    "USDT": "0x0d0707963952f2fba59dd06f2b425ace40b492fe",
+    "DAI": "0xad32aa4bff8b61b4ae07e3ba437cf81100af0cd7",
+    "OP": "0x2a82ae142b2e62cb7d10b55e323acb1cab663a26",
+    "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
+    "WETH": "0x6202a3b0be1d222971e93aab084c6e584c29db70",
 }
 
 
@@ -89,8 +104,14 @@ whale_addresses = {
 def token_whale(token):
     yield whale_addresses[token.symbol()]
 
+
 cToken_whale_addresses = {
-    "WFTM": "0x9258A95a684C18cFc2EAB859d22366c278bE11b3"
+    "USDC": "0xebe80f029b1c02862b9e8a70a7e5317c06f62cae",
+    "USDT": "0x0d0707963952f2fba59dd06f2b425ace40b492fe",
+    "DAI": "0xad32aa4bff8b61b4ae07e3ba437cf81100af0cd7",
+    "OP": "0x2a82ae142b2e62cb7d10b55e323acb1cab663a26",
+    "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
+    "WETH": "0x6202a3b0be1d222971e93aab084c6e584c29db70",
 }
 
 
@@ -115,14 +136,19 @@ def cToken_whale(token):
 #    print(f"Available liquidity: {cToken.getCash()/10**token.decimals()}")
 
 token_prices = {
-    "WFTM": 3
+    "USDT": 1,
+    "USDC": 1,
+    "DAI": 1,
+    "OP": 8,
+    "WBTC": 24_000,
+    "WETH": 1_800,
 }
 
 
 @pytest.fixture(autouse=True)
 def amount(token, token_whale, user):
     # this will get the number of tokens (around $1m worth of token)
-    amillion = round(10_000_000 / token_prices[token.symbol()])
+    amillion = round(1_000_000 / token_prices[token.symbol()])
     amount = amillion * 10 ** token.decimals()
     # In order to get some funds for the token you are about to use,
     # it impersonate a whale address
@@ -135,29 +161,33 @@ def amount(token, token_whale, user):
 
 @pytest.fixture
 def weth(interface):
-    token_address = "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83"
+    token_address = "0x4200000000000000000000000000000000000006" # USDC is used as middle token
     yield interface.ERC20(token_address)
 
+
 @pytest.fixture
-def screamComptroller(interface):
-    token_address = "0x260E596DAbE3AFc463e75B6CC05d8c46aCAcFB09"
+def sonne_comptroller(interface):
+    token_address = "0x60CF091cD3f50420d50fD7f707414d0DF4751C58"
     yield interface.ComptrollerI(token_address)
 
+
 @pytest.fixture
-def scream(interface):
-    token_address = "0xe0654C8e6fd4D733349ac7E09f6f23DA256bF475"
+def sonne(interface):
+    token_address = "0x1DB2466d9F5e10D7090E7152B68d62703a2245F0"
     yield interface.ERC20(token_address)
 
-@pytest.fixture
-def spookyrouter(interface):
-    token_address = "0xF491e7B69E4244ad4002BC14e878a34207E38c29"
-    yield interface.IUniswapV2Router02(token_address)
 
-#@pytest.fixture
-#def weth_amount(user, weth):
-#    weth_amount = 10 ** weth.decimals()
-#    user.transfer(weth, weth_amount)
-#    yield weth_amount
+@pytest.fixture
+def velodrome_router(interface):
+    token_address = "0x9c12939390052919aF3155f41Bf4160Fd3666A6f"
+    yield interface.IVelodromeRouter(token_address)
+
+
+@pytest.fixture
+def weth_amount(user, weth):
+   weth_amount = 10 ** weth.decimals()
+   weth.transfer(user, weth_amount, {"from": whale_addresses["WETH"]})
+   yield weth_amount
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -172,16 +202,6 @@ def vault(pm, gov, rewards, guardian, management, token):
     yield vault
 
 
-@pytest.fixture(scope="session")
-def registry():
-    yield Contract("0x727fe1759430df13655ddb0731dE0D0FDE929b04")
-
-
-@pytest.fixture(scope="session")
-def live_vault(registry, token):
-    yield registry.latestVault(token)
-
-
 @pytest.fixture
 def reentry_test(user, ReentryTest):
     reentry_test = user.deploy(ReentryTest)
@@ -189,16 +209,16 @@ def reentry_test(user, ReentryTest):
 
 
 @pytest.fixture
-def strategy(strategist, keeper, vault, Strategy, gov, cToken, spookyrouter, scream, screamComptroller, weth):
-    strategy = strategist.deploy(Strategy, vault, cToken,spookyrouter, scream, screamComptroller, weth, 1)
+def strategy(strategist, keeper, vault, Strategy, gov, cToken, velodrome_router, sonne, sonne_comptroller, weth):
+    strategy = strategist.deploy(Strategy, vault, cToken,velodrome_router, sonne, sonne_comptroller, weth, 1)
     strategy.setKeeper(keeper)
     vault.addStrategy(strategy, 10_000, 0, 2 ** 256 - 1, 0, {"from": gov})
     yield strategy
 
 
 @pytest.fixture
-def factory(LevCompFactory, vault, cToken, strategist, gov, spookyrouter, scream, screamComptroller, weth):
-    factory = strategist.deploy(LevCompFactory, vault, cToken,spookyrouter, scream, screamComptroller, weth, 1)
+def factory(LevCompFactory, vault, cToken, strategist, gov, velodrome_router, sonne, sonne_comptroller, weth):
+    factory = strategist.deploy(LevCompFactory, vault, cToken, velodrome_router, sonne, sonne_comptroller, weth, 1)
     yield factory
 
 
@@ -229,4 +249,3 @@ def withdraw_no_losses(vault, token, amount, user):
 @pytest.fixture(scope="session", autouse=True)
 def RELATIVE_APPROX():
     yield 1e-5
-

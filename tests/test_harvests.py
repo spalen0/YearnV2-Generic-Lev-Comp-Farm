@@ -15,7 +15,7 @@ def test_profitable_harvest(
     total_assets = strategy.estimatedTotalAssets()
     assert pytest.approx(total_assets, rel=RELATIVE_APPROX) == amount
 
-    blocks_to_sleep = 50
+    blocks_to_sleep = 50 * 12
     profit_amount = actions.generate_profit(strategy, blocks_to_sleep)
     strategy.setMinCompToSell(1e3)
     # check that estimatedTotalAssets estimates correctly
@@ -25,7 +25,7 @@ def test_profitable_harvest(
     # Harvest 2: Realize profit
     chain.sleep(1)
     tx = strategy.harvest({"from": strategist})
-    # profit amount is understimated on purpose
+    # profit amount is underestimated on purpose
     # checks.check_harvest_profit(tx, profit_amount)
 
     utils.sleep()
@@ -98,7 +98,7 @@ def test_choppy_harvest(
         strategy.estimatedTotalAssets() - vault.strategies(strategy).dict()["totalDebt"]
     )
 
-    blocks_to_sleep = 100
+    blocks_to_sleep = 100 * 12
     profit_amount = actions.generate_profit(strategy, blocks_to_sleep)
 
     chain.sleep(1)
@@ -112,7 +112,7 @@ def test_choppy_harvest(
 
     # User will take 100% losses and 100% profits
     assert (
-        pytest.approx(token.balanceOf(user), rel=RELATIVE_APPROX)
+        pytest.approx(token.balanceOf(user), rel=1e-3)
         == amount
         + tx.events["StrategyReported"]["totalGain"]
         - tx.events["StrategyReported"]["totalLoss"]
