@@ -29,7 +29,6 @@ contract Strategy is BaseStrategy {
     using SafeMath for uint256;
 
     address private constant USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
-    address private constant SONNE = 0x1DB2466d9F5e10D7090E7152B68d62703a2245F0;
 
     // Comptroller address for compound.finance
     ComptrollerI public compound;
@@ -39,7 +38,7 @@ contract Strategy is BaseStrategy {
     address public weth;
     CErc20I public cToken;
 
-    uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum, Sonne uses 1
+    uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum, Sonne uses 1 block per second for caluclations
 
     IVelodromeRouter public currentRouter; // velodrome router only
 
@@ -97,9 +96,11 @@ contract Strategy is BaseStrategy {
 
         // set minWant to 1e-5 want
         minWant = uint256(uint256(10)**uint256((IERC20Extended(address(want))).decimals())).div(1e5);
-        minCompToSell = 0.1 ether; //may need to be changed depending on what comp is
+        minCompToSell = 50 ether; //may need to be changed depending on what comp is, sonne price is 0,3$, value should be above 1e15
         collateralTarget = 0.73 ether;
         blocksToLiquidationDangerZone = 46500;
+
+        splitCompDistribution = true; // sonne impl
     }
 
     /*

@@ -119,6 +119,7 @@ cToken_whale_addresses = {
 def cToken_whale(token):
     yield cToken_whale_addresses[token.symbol()]
 
+
 #@pytest.fixture(autouse=True)
 #def withdraw_whale_liquidity(cToken_whale, cToken, token, strategy):
 #    borrows = cToken.borrowBalanceCurrent(cToken_whale, {'from': cToken_whale}).return_value
@@ -208,10 +209,21 @@ def reentry_test(user, ReentryTest):
     yield reentry_test
 
 
+min_want_values = {
+    "USDT": 1e6,
+    "USDC": 1e6,
+    "DAI": 1e18,
+    "OP": 1e18,
+    "WBTC": 1,
+    "WETH": 1e9,
+}
+
+
 @pytest.fixture
-def strategy(strategist, keeper, vault, Strategy, gov, cToken, velodrome_router, sonne, sonne_comptroller, weth):
+def strategy(strategist, keeper, vault, Strategy, gov, cToken, velodrome_router, sonne, sonne_comptroller, weth, token):
     strategy = strategist.deploy(Strategy, vault, cToken,velodrome_router, sonne, sonne_comptroller, weth, 1)
     strategy.setKeeper(keeper)
+    strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
     vault.addStrategy(strategy, 10_000, 0, 2 ** 256 - 1, 0, {"from": gov})
     yield strategy
 
@@ -220,30 +232,6 @@ def strategy(strategist, keeper, vault, Strategy, gov, cToken, velodrome_router,
 def factory(LevCompFactory, vault, cToken, strategist, gov, velodrome_router, sonne, sonne_comptroller, weth):
     factory = strategist.deploy(LevCompFactory, vault, cToken, velodrome_router, sonne, sonne_comptroller, weth, 1)
     yield factory
-
-
-@pytest.fixture
-def cloned_strategy(factory, vault, Strategy, strategy, cToken, strategist, gov):
-    # TODO: customize clone method and arguments
-    # TODO: use correct contract name (i.e. replace Strategy)
-    cloned_strategy = factory.cloneLevComp(
-        vault, cToken, {"from": strategist}
-    ).return_value
-    cloned_strategy = Strategy.at(cloned_strategy)
-    vault.revokeStrategy(strategy)
-    vault.addStrategy(cloned_strategy, 10_000, 0, 2 ** 256 - 1, 1_000, {"from": gov})
-    yield
-
-
-#@pytest.fixture(autouse=True)
-def withdraw_no_losses(vault, token, amount, user):
-    yield
-    if vault.totalSupply() == 0:
-        return
-    if vault.balanceOf(user) == 0:
-        print(f"TotalSupplyVault: {vault.totalSupply()}")
-        return
-    vault.withdraw({"from": user})
 
 
 @pytest.fixture(scope="session", autouse=True)

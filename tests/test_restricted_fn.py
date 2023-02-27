@@ -10,7 +10,7 @@ def test_restricted_fn_user(strategy, user):
         strategy.setForceMigrate(False, {"from": user})
 
     with reverts("!authorized"):
-        strategy.setMinCompToSell(0, {"from": user})
+        strategy.setMinCompToSell(1e15, {"from": user})
 
     with reverts("!authorized"):
         strategy.setMinWant(0, {"from": user})

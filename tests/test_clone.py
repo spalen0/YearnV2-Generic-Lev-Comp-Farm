@@ -29,7 +29,7 @@ def test_clone(
 
     # free funds from old strategy
     vault.revokeStrategy(strategy, {"from": gov})
-    strategy.setMinCompToSell(1e8, {"from": gov})
+    strategy.setMinCompToSell(1e15, {"from": gov})
     strategy.harvest({"from": gov})
 
     while strategy.estimatedTotalAssets() > strategy.minWant():

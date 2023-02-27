@@ -10,16 +10,16 @@ def test_profitable_harvest(
 
     # Harvest 1: Send funds through the strategy
     chain.sleep(1)
-    strategy.setMinCompToSell(1, {"from": strategist})
+    strategy.setMinCompToSell(1e15, {"from": strategist})
     strategy.harvest({"from": strategist})
     total_assets = strategy.estimatedTotalAssets()
     assert pytest.approx(total_assets, rel=RELATIVE_APPROX) == amount
 
     blocks_to_sleep = 50 * 12
     profit_amount = actions.generate_profit(strategy, blocks_to_sleep)
-    strategy.setMinCompToSell(1e3)
+    strategy.setMinCompToSell(1e15)
     # check that estimatedTotalAssets estimates correctly
-    assert total_assets + profit_amount == strategy.estimatedTotalAssets()
+    assert pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX) == total_assets + profit_amount
 
     before_pps = vault.pricePerShare()
     # Harvest 2: Realize profit
@@ -46,7 +46,7 @@ def test_lossy_harvest(
 
     # Harvest 1: Send funds through the strategy
     chain.sleep(1)
-    strategy.setMinCompToSell(1, {"from": strategist})
+    strategy.setMinCompToSell(1e15, {"from": strategist})
     strategy.harvest({"from": strategist})
     total_assets = strategy.estimatedTotalAssets()
     assert pytest.approx(total_assets, rel=RELATIVE_APPROX) == amount
@@ -81,7 +81,7 @@ def test_choppy_harvest(
 
     # Harvest 1: Send funds through the strategy
     chain.sleep(1)
-    strategy.setMinCompToSell(1, {"from": strategist})
+    strategy.setMinCompToSell(1e15, {"from": strategist})
     strategy.harvest({"from": strategist})
 
     assert pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX) == amount

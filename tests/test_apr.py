@@ -11,7 +11,7 @@ import pytest
 
 
 
-def test_apr_wftm(
+def test_apr(
     chain,
     accounts,
     token,
@@ -40,7 +40,7 @@ def test_apr_wftm(
     vault.setManagementFee(0, {"from": gov}) # set management fee to 0 so that time works
     
 
-    strategy.setMinCompToSell(1, {"from": gov})
+    strategy.setMinCompToSell(1e15, {"from": gov})
     #enormousrunningstrategy.setMinWant(0, {"from": gov})
     #assert enormousrunningstrategy.minCompToSell() == 1
     strategy.harvest({"from": gov})
@@ -64,7 +64,7 @@ def test_apr_wftm(
         #wait 6 hours. shouldnt mess up next round as compound uses blocks
         print("Locked: ", vault.lockedProfit())
         assert vault.lockedProfit() > 0 # some profit should be unlocked
-        chain.sleep(21600) # TODO: sonne uses seconds, not blocks
+        chain.sleep(21600) # sonne uses seconds, not blocks
         chain.mine(1)
         
         ppsAfter = vault.pricePerShare()
