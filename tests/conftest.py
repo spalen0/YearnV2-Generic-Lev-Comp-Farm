@@ -56,17 +56,19 @@ token_addresses = {
     "OP": "0x4200000000000000000000000000000000000042",
     "WBTC": "0x68f180fcce6836688e9084f035309e29bf0a2095",
     "WETH": "0x4200000000000000000000000000000000000006",
+    "wstETH": "0x1f32b1c2345538c0c6f582fcb022739c4a194ebb",
 }
 
 # TODO: uncomment those tokens you want to test as want
 @pytest.fixture(
     params=[
         "USDC",
-        # "USDT",
-        # "DAI",
+        "USDT",
+        "DAI",
         # "OP", # check why it won't start
         # "WBTC",
-        # "WETH",
+        "WETH",
+        # "wstETH", # check swap route on velodrome
     ],
     scope="session",
     autouse=True,
@@ -82,6 +84,7 @@ cToken_addresses = {
     "OP": "0x8cD6b19A07d754bF36AdEEE79EDF4F2134a8F571",
     "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
     "WETH": "0xf7B5965f5C117Eb1B5450187c9DcFccc3C317e8E",
+    "wstETH": "0x26AaB17f27CD1c8d06a0Ad8E4a1Af8B1032171d5",
 }
 
 
@@ -97,6 +100,7 @@ whale_addresses = {
     "OP": "0x2a82ae142b2e62cb7d10b55e323acb1cab663a26",
     "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
     "WETH": "0x6202a3b0be1d222971e93aab084c6e584c29db70",
+    "wstETH": "0xc6c1e8399c1c33a3f1959f2f77349d74a373345c",
 }
 
 
@@ -112,6 +116,7 @@ cToken_whale_addresses = {
     "OP": "0x2a82ae142b2e62cb7d10b55e323acb1cab663a26",
     "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
     "WETH": "0x6202a3b0be1d222971e93aab084c6e584c29db70",
+    "wstETH": "0x53b6fe8c6fa6b95119853f2929c8c6d61f437236",
 }
 
 
@@ -143,6 +148,7 @@ token_prices = {
     "OP": 8,
     "WBTC": 24_000,
     "WETH": 1_800,
+    "wstETH": 1_800,
 }
 
 
@@ -214,8 +220,19 @@ min_want_values = {
     "USDC": 1e6,
     "DAI": 1e18,
     "OP": 1e18,
-    "WBTC": 1,
-    "WETH": 1e9,
+    "WBTC": 1e3,
+    "WETH": 1e14,
+    "wstETH": 1e13,
+}
+
+collateral_target = {
+    "USDT": 80,
+    "USDC": 80,
+    "DAI": 80,
+    "OP": 60,
+    "WBTC": 58,
+    "WETH": 71,
+    "wstETH": 71,
 }
 
 
@@ -224,6 +241,7 @@ def strategy(strategist, keeper, vault, Strategy, gov, cToken, velodrome_router,
     strategy = strategist.deploy(Strategy, vault, cToken,velodrome_router, sonne, sonne_comptroller, weth, 1)
     strategy.setKeeper(keeper)
     strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
+    strategy.setCollateralTarget(collateral_target[token.symbol()] * 1e16, {"from": gov})
     vault.addStrategy(strategy, 10_000, 0, 2 ** 256 - 1, 0, {"from": gov})
     yield strategy
 

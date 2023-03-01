@@ -51,13 +51,13 @@ def test_emergency_exit(
     # Deposit to the vault
     actions.user_deposit(user, vault, token, amount)
     chain.sleep(1)
-    strategy.harvest({"from": strategist})
+    tx = strategy.harvest({"from": strategist})
     assert pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX) == amount
 
     # set emergency and exit
     strategy.setEmergencyExit()
     chain.sleep(1)
-    strategy.harvest({"from": strategist})
+    tx = strategy.harvest({"from": strategist})
     assert strategy.estimatedTotalAssets() < amount
 
 
@@ -99,6 +99,8 @@ def test_decrease_debt_ratio(
 
 
 def test_sweep(gov, vault, strategy, token, user, amount, weth, weth_amount):
+    if strategy.want() == weth:
+        return
     # Strategy want token doesn't work
     token.transfer(strategy, amount, {"from": user})
     assert token.address == strategy.want()

@@ -97,7 +97,7 @@ contract Strategy is BaseStrategy {
         // set minWant to 1e-5 want
         minWant = uint256(uint256(10)**uint256((IERC20Extended(address(want))).decimals())).div(1e5);
         minCompToSell = 50 ether; //may need to be changed depending on what comp is, sonne price is 0,3$, value should be above 1e15
-        collateralTarget = 0.73 ether;
+        collateralTarget = 0.71 ether; // change depending on the collateral, for stablecoins it can be heigher
         blocksToLiquidationDangerZone = 46500;
 
         splitCompDistribution = true; // sonne impl

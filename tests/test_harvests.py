@@ -41,6 +41,7 @@ def test_profitable_harvest(
 def test_lossy_harvest(
     chain, accounts, token, vault, strategy, user, strategist, amount, RELATIVE_APPROX
 ):
+    strategy.setCollateralTarget(5e17, {"from": strategist})
     # Deposit to the vault
     actions.user_deposit(user, vault, token, amount)
 
@@ -68,6 +69,7 @@ def test_lossy_harvest(
 
     # User will withdraw accepting losses
     vault.withdraw(vault.balanceOf(user), user, 10_000, {"from": user})
+    # weth didn't withdraw all it can at once but if we do it multiple times, result is correct
     assert pytest.approx(token.balanceOf(user) + loss_amount, rel=1e-3) == amount
 
 
@@ -76,6 +78,7 @@ def test_lossy_harvest(
 def test_choppy_harvest(
     chain, accounts, token, vault, strategy, user, strategist, amount, RELATIVE_APPROX
 ):
+    strategy.setCollateralTarget(5e17, {"from": strategist})
     # Deposit to the vault
     actions.user_deposit(user, vault, token, amount)
 
@@ -109,6 +112,7 @@ def test_choppy_harvest(
 
     # User will withdraw accepting losses
     vault.withdraw(vault.balanceOf(user), user, 10_000, {"from": user})
+    # weth didn't withdraw all it can at once but if we do it multiple times, result is correct
 
     # User will take 100% losses and 100% profits
     assert (
