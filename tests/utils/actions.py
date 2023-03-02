@@ -5,10 +5,11 @@ import utils
 # This file is reserved for standard actions like deposits
 def user_deposit(user, vault, token, amount):
     print(
-        f"Depositing {amount / 10 ** token.decimals()} {token.symbol()} from {user.address}"
+        f"Depositing {amount / 10 ** token.decimals()} {token.symbol()} from"
+        f" {user.address}"
     )
     if token.allowance(user, vault) < amount:
-        token.approve(vault, 2 ** 256 - 1, {"from": user})
+        token.approve(vault, 2**256 - 1, {"from": user})
     vault.deposit(amount, {"from": user})
     assert token.balanceOf(vault.address) == amount
 
@@ -18,7 +19,7 @@ def generate_profit(strategy, blocks_sleep):
     # setting min comp to sell to 0 to ensure that we sell it (even if not gas efficient)
     print(f"Generating profit for {blocks_sleep} blocks")
     total_assets_start = strategy.estimatedTotalAssets()
-    chain.sleep(int(blocks_sleep)) #1 block per second guess
+    chain.sleep(int(blocks_sleep))  # 1 block per second guess
     chain.mine(blocks_sleep)
     strategy.getLivePosition()  # to update
     total_assets_end = strategy.estimatedTotalAssets()

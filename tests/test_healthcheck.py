@@ -31,7 +31,9 @@ def test_healthcheck(user, vault, token, amount, strategy, chain, strategist, go
 
     # the harvest should go through, taking the loss
     tx = strategy.harvest({"from": strategist})
-    assert tx.events["Harvested"]["loss"] <= loss_amount # harvested loss is lower because sonne earns on seconds, not on blocks
+    assert (
+        tx.events["Harvested"]["loss"] <= loss_amount
+    )  # harvested loss is lower because sonne earns on seconds, not on blocks
 
     vault.withdraw({"from": user})
     assert token.balanceOf(user) < amount  # user took losses

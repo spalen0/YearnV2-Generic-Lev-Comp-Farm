@@ -5,10 +5,9 @@ from useful_methods import (
     stateOfStrat,
     stateOfVault,
     genericStateOfStrat,
-    genericStateOfVault
+    genericStateOfVault,
 )
 import pytest
-
 
 
 def test_apr(
@@ -24,9 +23,8 @@ def test_apr(
     amount,
     RELATIVE_APPROX,
 ):
-    
     # Deposit to the vault
-    #gov = accounts.at(vault.governance(), force=True)
+    # gov = accounts.at(vault.governance(), force=True)
     comp = interface.ERC20(strategy.comp())
     user_balance_before = token.balanceOf(user)
     actions.user_deposit(user, vault, token, amount)
@@ -36,13 +34,14 @@ def test_apr(
     strategy.harvest({"from": strategist})
 
     strategy.setProfitFactor(1, {"from": gov})
-    #assert enormousrunningstrategy.profitFactor() == 1
-    vault.setManagementFee(0, {"from": gov}) # set management fee to 0 so that time works
-    
+    # assert enormousrunningstrategy.profitFactor() == 1
+    vault.setManagementFee(
+        0, {"from": gov}
+    )  # set management fee to 0 so that time works
 
     strategy.setMinCompToSell(1e15, {"from": gov})
-    #enormousrunningstrategy.setMinWant(0, {"from": gov})
-    #assert enormousrunningstrategy.minCompToSell() == 1
+    # enormousrunningstrategy.setMinWant(0, {"from": gov})
+    # assert enormousrunningstrategy.minCompToSell() == 1
     strategy.harvest({"from": gov})
     chain.sleep(21600)
 
@@ -51,30 +50,28 @@ def test_apr(
 
     startingBalance = vault.totalAssets()
 
-    for i in range(2): # TODO: see how many times we can run this
-
+    for i in range(2):  # TODO: see how many times we can run this
         waitBlock = 25
         print(f"\n----wait {waitBlock} blocks----")
-        #wait(waitBlock, chain)
+        # wait(waitBlock, chain)
         chain.mine(waitBlock)
         ppsBefore = vault.pricePerShare()
-        
 
         strategy.harvest({"from": gov})
-        #wait 6 hours. shouldnt mess up next round as compound uses blocks
+        # wait 6 hours. shouldnt mess up next round as compound uses blocks
         print("Locked: ", vault.lockedProfit())
-        assert vault.lockedProfit() > 0 # some profit should be unlocked
-        chain.sleep(21600) # sonne uses seconds, not blocks
+        assert vault.lockedProfit() > 0  # some profit should be unlocked
+        chain.sleep(21600)  # sonne uses seconds, not blocks
         chain.mine(1)
-        
+
         ppsAfter = vault.pricePerShare()
 
-        #stateOfStrat(enormousrunningstrategy, dai, comp)
+        # stateOfStrat(enormousrunningstrategy, dai, comp)
         # stateOfVault(vault, enormousrunningstrategy)
 
         profit = (vault.totalAssets() - startingBalance).to("ether")
         strState = vault.strategies(strategy)
-        totalReturns = strState.dict()['totalGain']
+        totalReturns = strState.dict()["totalGain"]
         totaleth = totalReturns.to("ether")
         print(f"Real Profit: {profit:.5f}")
         difff = profit - totaleth
@@ -82,7 +79,7 @@ def test_apr(
         print(f"PPS: {ppsAfter}")
 
         print(f"PPS Diff: {ppsAfter - ppsBefore}")
-        assert ppsAfter - ppsBefore > 0 # pps should have risen
+        assert ppsAfter - ppsBefore > 0  # pps should have risen
 
         blocks_per_year = 31_536_000
         assert startingBalance != 0
@@ -93,6 +90,5 @@ def test_apr(
         print(f"implied apr assets: {apr:.8%}")
         print(f"implied apr pps: {ppsProfit:.8%}")
 
-
-    print(strategy.minWant()/1e18)
+    print(strategy.minWant() / 1e18)
     stateOfStrat(strategy, token, comp)

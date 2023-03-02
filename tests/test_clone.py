@@ -8,10 +8,10 @@ def test_clone(
     strategy,
     Strategy,
     token,
-    cToken, 
-    velodrome_router, 
-    sonne, 
-    sonne_comptroller, 
+    cToken,
+    velodrome_router,
+    sonne,
+    sonne_comptroller,
     weth,
     pm,
     factory,
@@ -25,7 +25,16 @@ def test_clone(
     actions.first_deposit_and_harvest(
         vault, strategy, token, user, gov, amount, RELATIVE_APPROX
     )
-    cloned_strategy = factory.cloneLevComp(vault, cToken,velodrome_router, sonne, sonne_comptroller, weth, 1, {"from": gov}).return_value
+    cloned_strategy = factory.cloneLevComp(
+        vault,
+        cToken,
+        velodrome_router,
+        sonne,
+        sonne_comptroller,
+        weth,
+        1,
+        {"from": gov},
+    ).return_value
     cloned_strategy = Strategy.at(cloned_strategy)
     cloned_strategy.setCollateralTarget(collateral_target, {"from": gov})
 
@@ -42,7 +51,7 @@ def test_clone(
         print(f"minWant: {strategy.minWant()}")
     assert strategy.estimatedTotalAssets() < strategy.minWant()
 
-    vault.addStrategy(cloned_strategy, 10_000, 0, 2 ** 256 - 1, 0, {"from": gov})
+    vault.addStrategy(cloned_strategy, 10_000, 0, 2**256 - 1, 0, {"from": gov})
     # take funds to new strategy
     utils.sleep(1)
     cloned_strategy.harvest({"from": gov})

@@ -25,7 +25,9 @@ def test_shutdown(chain, token, vault, strategy, amount, gov, user, RELATIVE_APP
     tx = strategy.harvest({"from": gov})
     utils.sleep(1)
     chain.mine(5)
-    tx = strategy.harvest({"from": gov}) # brownie.exceptions.VirtualMachineError: revert: IOA at Strategy.sol L628: uint256 exchangeRateStored = cToken.exchangeRateStored();
+    tx = strategy.harvest(
+        {"from": gov}
+    )  # brownie.exceptions.VirtualMachineError: revert: IOA at Strategy.sol L628: uint256 exchangeRateStored = cToken.exchangeRateStored();
     utils.sleep()
     tx = strategy.harvest({"from": gov})
 

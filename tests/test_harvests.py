@@ -19,7 +19,10 @@ def test_profitable_harvest(
     profit_amount = actions.generate_profit(strategy, blocks_to_sleep)
     strategy.setMinCompToSell(1e15)
     # check that estimatedTotalAssets estimates correctly
-    assert pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX) == total_assets + profit_amount
+    assert (
+        pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX)
+        == total_assets + profit_amount
+    )
 
     before_pps = vault.pricePerShare()
     # Harvest 2: Realize profit

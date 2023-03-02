@@ -41,7 +41,9 @@ def test_revoke_strategy_from_strategy(
         {"from": gov},
     )
     chain.sleep(1)
-    tx = strategy.harvest({"from": gov}) # TODO: see why this fails on function _withdrawSome
+    tx = strategy.harvest(
+        {"from": gov}
+    )  # TODO: see why this fails on function _withdrawSome
     assert pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX) == amount
 
     strategy.setEmergencyExit()

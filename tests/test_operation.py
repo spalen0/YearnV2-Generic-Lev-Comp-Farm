@@ -124,4 +124,3 @@ def test_sweep(gov, vault, strategy, token, user, amount, weth, weth_amount):
     assert weth.balanceOf(user) == 0
     strategy.sweep(weth, {"from": gov})
     assert weth.balanceOf(gov) == weth_amount + before_balance
-

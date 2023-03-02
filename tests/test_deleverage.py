@@ -127,9 +127,11 @@ def test_large_manual_deleverage_to_zero(
 
     deposits, borrows = strategy.getCurrentPosition()
     while deposits > strategy.minWant():
-        strategy.manualReleaseWant(deposits-borrows/(strategy.collateralTarget()/1e18), {"from": gov})
+        strategy.manualReleaseWant(
+            deposits - borrows / (strategy.collateralTarget() / 1e18), {"from": gov}
+        )
         deposits, borrows = strategy.getCurrentPosition()
-    
+
     assert strategy.getCurrentPosition().dict()["deposits"] <= strategy.minWant()
 
     utils.sleep()

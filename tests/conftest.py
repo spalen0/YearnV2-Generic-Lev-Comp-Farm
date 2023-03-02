@@ -125,14 +125,14 @@ def cToken_whale(token):
     yield cToken_whale_addresses[token.symbol()]
 
 
-#@pytest.fixture(autouse=True)
-#def withdraw_whale_liquidity(cToken_whale, cToken, token, strategy):
+# @pytest.fixture(autouse=True)
+# def withdraw_whale_liquidity(cToken_whale, cToken, token, strategy):
 #    borrows = cToken.borrowBalanceCurrent(cToken_whale, {'from': cToken_whale}).return_value
 #    supply = cToken.balanceOfUnderlying(cToken_whale, {'from': cToken_whale}).return_value
 #    print(f"borrow: {borrows/ 10 ** token.decimals()}")
 #    print(f"supply: {supply/ 10 ** token.decimals()}")
 #    comptroller = Contract(cToken.comptroller())
-#    l, collatFactor, c = comptroller.markets(cToken) 
+#    l, collatFactor, c = comptroller.markets(cToken)
 
 #    amount = supply - borrows / collatFactor * 1e18
 
@@ -168,7 +168,9 @@ def amount(token, token_whale, user):
 
 @pytest.fixture
 def weth(interface):
-    token_address = "0x4200000000000000000000000000000000000006" # USDC is used as middle token
+    token_address = (  # USDC is used as middle token
+        "0x4200000000000000000000000000000000000006"
+    )
     yield interface.ERC20(token_address)
 
 
@@ -192,9 +194,9 @@ def velodrome_router(interface):
 
 @pytest.fixture
 def weth_amount(user, weth):
-   weth_amount = 10 ** weth.decimals()
-   weth.transfer(user, weth_amount, {"from": whale_addresses["WETH"]})
-   yield weth_amount
+    weth_amount = 10 ** weth.decimals()
+    weth.transfer(user, weth_amount, {"from": whale_addresses["WETH"]})
+    yield weth_amount
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -202,7 +204,7 @@ def vault(pm, gov, rewards, guardian, management, token):
     Vault = pm(config["dependencies"][0]).Vault
     vault = guardian.deploy(Vault)
     vault.initialize(token, gov, rewards, "", "", guardian, management)
-    vault.setDepositLimit(2 ** 256 - 1, {"from": gov})
+    vault.setDepositLimit(2**256 - 1, {"from": gov})
     vault.setManagement(management, {"from": gov})
     vault.setManagementFee(0, {"from": gov})
     vault.setPerformanceFee(0, {"from": gov})
@@ -234,24 +236,60 @@ collateral_target_values = {
     "WETH": 71,
     "wstETH": 50,
 }
+
+
 @pytest.fixture
 def collateral_target(token):
     yield collateral_target_values[token.symbol()] * 1e16
 
 
 @pytest.fixture
-def strategy(strategist, keeper, vault, Strategy, gov, cToken, velodrome_router, sonne, sonne_comptroller, weth, token, collateral_target):
-    strategy = strategist.deploy(Strategy, vault, cToken,velodrome_router, sonne, sonne_comptroller, weth, 1)
+def strategy(
+    strategist,
+    keeper,
+    vault,
+    Strategy,
+    gov,
+    cToken,
+    velodrome_router,
+    sonne,
+    sonne_comptroller,
+    weth,
+    token,
+    collateral_target,
+):
+    strategy = strategist.deploy(
+        Strategy, vault, cToken, velodrome_router, sonne, sonne_comptroller, weth, 1
+    )
     strategy.setKeeper(keeper)
     strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
     strategy.setCollateralTarget(collateral_target, {"from": gov})
-    vault.addStrategy(strategy, 10_000, 0, 2 ** 256 - 1, 0, {"from": gov})
+    vault.addStrategy(strategy, 10_000, 0, 2**256 - 1, 0, {"from": gov})
     yield strategy
 
 
 @pytest.fixture
-def factory(LevCompFactory, vault, cToken, strategist, gov, velodrome_router, sonne, sonne_comptroller, weth):
-    factory = strategist.deploy(LevCompFactory, vault, cToken, velodrome_router, sonne, sonne_comptroller, weth, 1)
+def factory(
+    LevCompFactory,
+    vault,
+    cToken,
+    strategist,
+    gov,
+    velodrome_router,
+    sonne,
+    sonne_comptroller,
+    weth,
+):
+    factory = strategist.deploy(
+        LevCompFactory,
+        vault,
+        cToken,
+        velodrome_router,
+        sonne,
+        sonne_comptroller,
+        weth,
+        1,
+    )
     yield factory
 
 

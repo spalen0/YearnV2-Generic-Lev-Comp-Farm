@@ -4,7 +4,9 @@ import pytest
 from utils import actions, checks, utils
 
 
-def test_triggers(chain, gov, vault, strategy, token, amount, user, strategist, sonne_comptroller):
+def test_triggers(
+    chain, gov, vault, strategy, token, amount, user, strategist, sonne_comptroller
+):
     # Deposit to the vault and harvest
     actions.user_deposit(user, vault, token, amount)
     chain.sleep(1)

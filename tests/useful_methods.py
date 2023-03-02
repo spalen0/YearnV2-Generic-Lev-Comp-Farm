@@ -6,7 +6,7 @@ import requests
 
 def get_gas_price(confirmation_speed: str = "fast"):
     if "mainnet" not in network.show_active():
-        return 10 ** 9  # 1 gwei
+        return 10**9  # 1 gwei
     data = requests.get("https://www.gasnow.org/api/v3/gas/price").json()
     return data["data"][confirmation_speed]
 
@@ -32,7 +32,6 @@ def harvest(strategy, keeper, vault):
 
 
 def tend(strategy, keeper):
-
     tendCondition = strategy.tendTrigger(0, {"from": keeper})
 
     if tendCondition:
@@ -47,15 +46,15 @@ def stateOfStrat(strategy, dai, comp):
     deposits, borrows = strategy.getCurrentPosition()
     compBal = comp.balanceOf(strategy)
     print("Comp:", "{:,.4f}".format(compBal / 1e18))
-    print("Want:", "{:,.1f}".format(dai.balanceOf(strategy) / (10 ** decimals)))
-    print("borrows:", borrows / (10 ** decimals))
-    print("deposits:", "{:,.1f}".format(deposits / (10 ** decimals)))
+    print("Want:", "{:,.1f}".format(dai.balanceOf(strategy) / (10**decimals)))
+    print("borrows:", borrows / (10**decimals))
+    print("deposits:", "{:,.1f}".format(deposits / (10**decimals)))
     realbalance = dai.balanceOf(strategy) + deposits - borrows
-    print("total assets real:", "{:,.1f}".format(realbalance / (10 ** decimals)))
+    print("total assets real:", "{:,.1f}".format(realbalance / (10**decimals)))
 
     print(
         "total assets estimate:",
-        "{:,.1f}".format(strategy.estimatedTotalAssets() / (10 ** decimals)),
+        "{:,.1f}".format(strategy.estimatedTotalAssets() / (10**decimals)),
     )
     if deposits == 0:
         collat = 0
@@ -67,7 +66,7 @@ def stateOfStrat(strategy, dai, comp):
     print(f"stored collat: {storedCollat:.5%}")
     print(f"leverage: {leverage:.5f}x")
     # assert collat <= 0.75
-    print("Expected Profit:", strategy.expectedReturn() / (10 ** decimals))
+    print("Expected Profit:", strategy.expectedReturn() / (10**decimals))
     toLiquidation = strategy.getblocksUntilLiquidation()
     print("Weeks to liquidation:", toLiquidation / 44100)
 
@@ -76,13 +75,13 @@ def genericStateOfStrat(strategy, currency, vault):
     decimals = currency.decimals()
     print(f"\n----state of {strategy.name()}----")
 
-    print("Want:", currency.balanceOf(strategy) / (10 ** decimals))
-    print("Total assets estimate:", strategy.estimatedTotalAssets() / (10 ** decimals))
+    print("Want:", currency.balanceOf(strategy) / (10**decimals))
+    print("Total assets estimate:", strategy.estimatedTotalAssets() / (10**decimals))
     strState = vault.strategies(strategy)
-    totalDebt = strState.dict()["totalDebt"] / (10 ** decimals)
+    totalDebt = strState.dict()["totalDebt"] / (10**decimals)
     debtLimit = strState.dict()["debtRatio"]
-    totalLosses = strState.dict()["totalLoss"] / (10 ** decimals)
-    totalReturns = strState.dict()["totalGain"] / (10 ** decimals)
+    totalLosses = strState.dict()["totalLoss"] / (10**decimals)
+    totalReturns = strState.dict()["totalGain"] / (10**decimals)
     print(f"Total Strategy Debt: {totalDebt:.5f}")
     print(f"Strategy Debt Limit: {debtLimit:.5f}")
     print(f"Total Strategy Gains: {totalReturns}")
@@ -97,11 +96,11 @@ def genericStateOfStrat(strategy, currency, vault):
 def genericStateOfVault(vault, currency):
     decimals = currency.decimals()
     print(f"\n----state of {vault.name()} vault----")
-    balance = vault.totalAssets() / (10 ** decimals)
+    balance = vault.totalAssets() / (10**decimals)
     print(f"Total Assets: {balance:.5f}")
-    balance = vault.totalDebt() / (10 ** decimals)
-    pricePerShare = vault.pricePerShare() / (10 ** decimals)
-    print("Loose balance in vault:", currency.balanceOf(vault) / (10 ** decimals))
+    balance = vault.totalDebt() / (10**decimals)
+    pricePerShare = vault.pricePerShare() / (10**decimals)
+    print("Loose balance in vault:", currency.balanceOf(vault) / (10**decimals))
     print(f"Total Debt: {balance:.5f}")
     print(f"Price Per Share: {pricePerShare:.5f}")
 
