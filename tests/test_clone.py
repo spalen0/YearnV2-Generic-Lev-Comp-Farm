@@ -19,6 +19,7 @@ def test_clone(
     gov,
     user,
     RELATIVE_APPROX,
+    collateral_target,
 ):
     # send strategy to steady state
     actions.first_deposit_and_harvest(
@@ -26,6 +27,7 @@ def test_clone(
     )
     cloned_strategy = factory.cloneLevComp(vault, cToken,velodrome_router, sonne, sonne_comptroller, weth, 1, {"from": gov}).return_value
     cloned_strategy = Strategy.at(cloned_strategy)
+    cloned_strategy.setCollateralTarget(collateral_target, {"from": gov})
 
     # free funds from old strategy
     vault.revokeStrategy(strategy, {"from": gov})

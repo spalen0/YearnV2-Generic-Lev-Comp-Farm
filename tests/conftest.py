@@ -68,7 +68,7 @@ token_addresses = {
         # "OP", # check why it won't start
         # "WBTC",
         "WETH",
-        # "wstETH", # check swap route on velodrome
+        "wstETH",
     ],
     scope="session",
     autouse=True,
@@ -225,23 +225,26 @@ min_want_values = {
     "wstETH": 1e13,
 }
 
-collateral_target = {
+collateral_target_values = {
     "USDT": 80,
     "USDC": 80,
     "DAI": 80,
     "OP": 60,
-    "WBTC": 58,
+    "WBTC": 55,
     "WETH": 71,
-    "wstETH": 71,
+    "wstETH": 50,
 }
+@pytest.fixture
+def collateral_target(token):
+    yield collateral_target_values[token.symbol()] * 1e16
 
 
 @pytest.fixture
-def strategy(strategist, keeper, vault, Strategy, gov, cToken, velodrome_router, sonne, sonne_comptroller, weth, token):
+def strategy(strategist, keeper, vault, Strategy, gov, cToken, velodrome_router, sonne, sonne_comptroller, weth, token, collateral_target):
     strategy = strategist.deploy(Strategy, vault, cToken,velodrome_router, sonne, sonne_comptroller, weth, 1)
     strategy.setKeeper(keeper)
     strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
-    strategy.setCollateralTarget(collateral_target[token.symbol()] * 1e16, {"from": gov})
+    strategy.setCollateralTarget(collateral_target, {"from": gov})
     vault.addStrategy(strategy, 10_000, 0, 2 ** 256 - 1, 0, {"from": gov})
     yield strategy
 

@@ -15,6 +15,7 @@ def test_operation(
     gov,
     amount,
     RELATIVE_APPROX,
+    collateral_target,
 ):
     # Deposit to the vault
     user_balance_before = token.balanceOf(user)
@@ -29,7 +30,7 @@ def test_operation(
 
     assert pytest.approx(strategy.estimatedTotalAssets(), rel=RELATIVE_APPROX) == amount
 
-    strategy.setCollateralTarget(63 * 1e16, {"from": gov})
+    strategy.setCollateralTarget(collateral_target, {"from": gov})
 
     # tend()
     strategy.tend({"from": strategist})
