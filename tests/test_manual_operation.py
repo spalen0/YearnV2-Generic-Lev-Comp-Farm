@@ -1,5 +1,6 @@
 from utils import actions
 from utils import utils
+from brownie import reverts, ZERO_ADDRESS
 import pytest
 
 
@@ -53,3 +54,11 @@ def test_manual_release_want(
     strategy.harvest({"from": gov})
     utils.sleep()
     return
+
+
+def test_set_router(strategy, gov, velodrome_router):
+    with reverts("Router cannot be 0"):
+        strategy.setRouter(ZERO_ADDRESS, {"from": gov})
+
+    strategy.setRouter(velodrome_router, {"from": gov})
+    assert strategy.currentRouter() == velodrome_router

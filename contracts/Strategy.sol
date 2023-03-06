@@ -67,7 +67,7 @@ contract Strategy is BaseStrategy {
     }
 
     function name() external view override returns (string memory) {
-        return "GenLevCompV3NoFlash";
+        return "GenLevSonne3NoFlash";
     }
 
     function initialize(address _vault, address _cToken, address _router, address _comp, address _comptroller, address _weth, uint256 _secondsPerBlock) external {
@@ -97,6 +97,7 @@ contract Strategy is BaseStrategy {
         // set minWant to 1e-5 want
         minWant = uint256(uint256(10)**uint256((IERC20Extended(address(want))).decimals())).div(1e5);
         minCompToSell = 50 ether; //may need to be changed depending on what comp is, sonne price is 0,3$, value should be above 1e15
+        // minCompToSell = uint256(10).mul(1e24).div(priceCheck(comp, USDC, 1e18)); // denomiated to 10 usdc, price check returns in usdc 10^6 precision
         collateralTarget = 0.71 ether; // change depending on the collateral, for stablecoins it can be heigher
         blocksToLiquidationDangerZone = 46500;
 
@@ -115,8 +116,9 @@ contract Strategy is BaseStrategy {
         dontClaimComp = _dontClaimComp;
     }
 
-    function setRouter(address _currentV2Router) external onlyGovernance {
-        currentRouter = IVelodromeRouter(_currentV2Router); // TODO: not verified in the test
+    function setRouter(address _newRouter) external onlyGovernance {
+        require(_newRouter != address(0), "Router cannot be 0");
+        currentRouter = IVelodromeRouter(_newRouter);
     }
 
     function setForceMigrate(bool _force) external onlyGovernance {
