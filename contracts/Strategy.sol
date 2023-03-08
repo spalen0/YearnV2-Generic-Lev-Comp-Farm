@@ -37,6 +37,7 @@ contract Strategy is BaseStrategy {
     address public comp;
     address public weth;
     CErc20I public cToken;
+    bool public isWethSwap;
 
     uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum, Sonne uses 1 block per second for caluclations
 
@@ -97,7 +98,6 @@ contract Strategy is BaseStrategy {
         // set minWant to 1e-5 want
         minWant = uint256(uint256(10)**uint256((IERC20Extended(address(want))).decimals())).div(1e5);
         minCompToSell = 50 ether; //may need to be changed depending on what comp is, sonne price is 0,3$, value should be above 1e15
-        // minCompToSell = uint256(10).mul(1e24).div(priceCheck(comp, USDC, 1e18)); // denomiated to 10 usdc, price check returns in usdc 10^6 precision
         collateralTarget = 0.71 ether; // change depending on the collateral, for stablecoins it can be heigher
         blocksToLiquidationDangerZone = 46500;
 
@@ -140,6 +140,10 @@ contract Strategy is BaseStrategy {
 
     function setMinWant(uint256 _minWant) external management {
         minWant = _minWant;
+    }
+
+    function setIsWethSwap(bool _isWethSwap) external management {
+        isWethSwap = _isWethSwap;
     }
 
     function setCollateralTarget(uint256 _collateralTarget) external management {
@@ -602,14 +606,15 @@ contract Strategy is BaseStrategy {
     }
 
     function getTokenOutPathV2(address _tokenIn, address _tokenOut) internal view returns (IVelodromeRouter.route[] memory _path) {
-        bool isUsdc = _tokenOut == USDC;
-        _path = new IVelodromeRouter.route[](isUsdc ? 1 : 2);
+        address swapToken = isWethSwap ? weth : USDC;
+        bool isSwapToken = _tokenOut == swapToken;
+        _path = new IVelodromeRouter.route[](isSwapToken ? 1 : 2);
 
-        if (isUsdc) {
-            _path[0] = IVelodromeRouter.route(_tokenIn, USDC, false);
+        if (isSwapToken) {
+            _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false);
         } else {
-            _path[0] = IVelodromeRouter.route(_tokenIn, USDC, false);
-            _path[1] = IVelodromeRouter.route(USDC, _tokenOut, false);
+            _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false);
+            _path[1] = IVelodromeRouter.route(swapToken, _tokenOut, false);
         }
     }
 
