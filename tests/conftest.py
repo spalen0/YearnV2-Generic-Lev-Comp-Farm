@@ -243,6 +243,21 @@ def collateral_target(token):
     yield collateral_target_values[token.symbol()] * 1e16
 
 
+velo_want_stable_values = {
+    "USDT": True,
+    "USDC": True,
+    "DAI": True,
+    "OP": False,
+    "WBTC": False,
+    "WETH": False,
+    "wstETH": False,
+}
+
+@pytest.fixture
+def velo_want_stable(token):
+    yield velo_want_stable_values[token.symbol()]
+
+
 @pytest.fixture
 def strategy(
     strategist,
@@ -263,6 +278,7 @@ def strategy(
     strategy.setKeeper(keeper)
     strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
     strategy.setCollateralTarget(collateral_target, {"from": gov})
+    strategy.setIsVeloWantStable(velo_want_stable_values[token.symbol()], {"from": gov})
     vault.addStrategy(strategy, 10_000, 0, 2**256 - 1, 0, {"from": gov})
     yield strategy
 

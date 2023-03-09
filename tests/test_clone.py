@@ -20,6 +20,7 @@ def test_clone(
     user,
     RELATIVE_APPROX,
     collateral_target,
+    velo_want_stable,
 ):
     # send strategy to steady state
     actions.first_deposit_and_harvest(
@@ -36,6 +37,7 @@ def test_clone(
     ).return_value
     cloned_strategy = Strategy.at(cloned_strategy)
     cloned_strategy.setCollateralTarget(collateral_target, {"from": gov})
+    cloned_strategy.setIsVeloWantStable(velo_want_stable, {"from": gov})
 
     # free funds from old strategy
     vault.revokeStrategy(strategy, {"from": gov})

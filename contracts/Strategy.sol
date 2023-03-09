@@ -37,7 +37,6 @@ contract Strategy is BaseStrategy {
     //Only three tokens we use
     address public comp;
     CErc20I public cToken;
-    bool public isWethSwap;
 
     uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum, Sonne uses 1 block per second for caluclations
 
@@ -51,6 +50,8 @@ contract Strategy is BaseStrategy {
     // Rewards handling
     bool public dontClaimComp; // enable/disables COMP claiming
     uint256 public minCompToSell; // minimum amount of COMP to be sold
+    bool public isWethSwap;
+    bool public isVeloWantStable;
 
     uint256 public iterations; //number of loops we do
 
@@ -141,6 +142,17 @@ contract Strategy is BaseStrategy {
         (, uint256 collateralFactorMantissa, ) = compound.markets(address(cToken));
         require(collateralFactorMantissa > _collateralTarget);
         collateralTarget = _collateralTarget;
+    }
+
+    function setIsVeloWantStable(bool _isVeloWantStable) external management {
+        isVeloWantStable = _isVeloWantStable;
+    }
+
+    function setRewardBehavior(uint256 _minCompToSell, bool _dontClaimComp, bool _isWethSwap, bool _isVeloWantStable) external management {
+        minCompToSell = _minCompToSell;
+        dontClaimComp = _dontClaimComp;
+        isWethSwap = _isWethSwap;
+        isVeloWantStable = _isVeloWantStable;
     }
 
     /*
@@ -594,7 +606,7 @@ contract Strategy is BaseStrategy {
             _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false);
         } else {
             _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false);
-            _path[1] = IVelodromeRouter.route(swapToken, _tokenOut, false);
+            _path[1] = IVelodromeRouter.route(swapToken, _tokenOut, isVeloWantStable && !isWethSwap);
         }
     }
 
