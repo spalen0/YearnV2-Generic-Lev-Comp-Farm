@@ -254,12 +254,11 @@ def strategy(
     velodrome_router,
     sonne,
     sonne_comptroller,
-    weth,
     token,
     collateral_target,
 ):
     strategy = strategist.deploy(
-        Strategy, vault, cToken, velodrome_router, sonne, sonne_comptroller, weth, 1
+        Strategy, vault, cToken, velodrome_router, sonne, sonne_comptroller, 1
     )
     strategy.setKeeper(keeper)
     strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
@@ -278,7 +277,6 @@ def factory(
     velodrome_router,
     sonne,
     sonne_comptroller,
-    weth,
 ):
     factory = strategist.deploy(
         LevCompFactory,
@@ -287,7 +285,6 @@ def factory(
         velodrome_router,
         sonne,
         sonne_comptroller,
-        weth,
         1,
     )
     yield factory

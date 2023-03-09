@@ -29,13 +29,13 @@ contract Strategy is BaseStrategy {
     using SafeMath for uint256;
 
     address private constant USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
+    address private constant WETH = 0x4200000000000000000000000000000000000006;
 
     // Comptroller address for compound.finance
     ComptrollerI public compound;
 
     //Only three tokens we use
     address public comp;
-    address public weth;
     CErc20I public cToken;
     bool public isWethSwap;
 
@@ -59,8 +59,8 @@ contract Strategy is BaseStrategy {
 
     bool public splitCompDistribution;
 
-    constructor(address _vault, address _cToken, address _router, address _comp, address _comptroller, address _weth, uint256 _secondsPerBlock) public BaseStrategy(_vault) {
-        _initializeThis(_cToken, _router, _comp, _comptroller, _weth, _secondsPerBlock);
+    constructor(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) public BaseStrategy(_vault) {
+        _initializeThis(_cToken, _router, _comp, _comptroller, _secondsPerBlock);
     }
 
     function approveTokenMax(address token, address spender) internal {
@@ -71,15 +71,14 @@ contract Strategy is BaseStrategy {
         return "GenLevSonne3NoFlash";
     }
 
-    function initialize(address _vault, address _cToken, address _router, address _comp, address _comptroller, address _weth, uint256 _secondsPerBlock) external {
+    function initialize(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) external {
         _initialize(_vault, msg.sender, msg.sender, msg.sender);
-        _initializeThis(_cToken, _router, _comp, _comptroller, _weth, _secondsPerBlock);
+        _initializeThis(_cToken, _router, _comp, _comptroller, _secondsPerBlock);
     }
 
-    function _initializeThis(address _cToken, address _router, address _comp, address _comptroller, address _weth, uint256 _secondsPerBlock) internal {
+    function _initializeThis(address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) internal {
         cToken = CErc20I(_cToken);
         comp = _comp;
-        weth = _weth;
         secondsPerBlock = _secondsPerBlock;
         compound = ComptrollerI(_comptroller);
         require(IERC20Extended(address(want)).decimals() <= 18); // dev: want not supported
@@ -606,7 +605,7 @@ contract Strategy is BaseStrategy {
     }
 
     function getTokenOutPathV2(address _tokenIn, address _tokenOut) internal view returns (IVelodromeRouter.route[] memory _path) {
-        address swapToken = isWethSwap ? weth : USDC;
+        address swapToken = isWethSwap ? WETH : USDC;
         bool isSwapToken = _tokenOut == swapToken;
         _path = new IVelodromeRouter.route[](isSwapToken ? 1 : 2);
 
@@ -741,7 +740,7 @@ contract Strategy is BaseStrategy {
     // -- Internal Helper functions -- //
 
     function ethToWant(uint256 _amtInWei) public view override returns (uint256) {
-        return priceCheck(weth, address(want), _amtInWei);
+        return priceCheck(WETH, address(want), _amtInWei);
     }
 
     function liquidateAllPositions() internal override returns (uint256 _amountFreed) {

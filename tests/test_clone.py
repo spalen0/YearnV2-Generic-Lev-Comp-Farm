@@ -31,7 +31,6 @@ def test_clone(
         velodrome_router,
         sonne,
         sonne_comptroller,
-        weth,
         1,
         {"from": gov},
     ).return_value

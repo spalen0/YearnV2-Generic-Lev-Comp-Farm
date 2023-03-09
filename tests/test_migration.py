@@ -32,7 +32,7 @@ def test_migration(
 
     # migrate to a new strategy
     new_strategy = strategist.deploy(
-        Strategy, vault, cToken, velodrome_router, sonne, sonne_comptroller, weth, 1
+        Strategy, vault, cToken, velodrome_router, sonne, sonne_comptroller, 1
     )
     vault.migrateStrategy(strategy, new_strategy, {"from": gov})
     assert (
