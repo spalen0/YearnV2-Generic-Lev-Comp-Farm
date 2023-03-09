@@ -68,7 +68,7 @@ contract Strategy is BaseStrategy {
     }
 
     function name() external view override returns (string memory) {
-        return "GenLevSonne3NoFlash";
+        return "GenLevSonneNoFlash";
     }
 
     function initialize(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) external {
