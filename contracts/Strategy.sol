@@ -57,8 +57,6 @@ contract Strategy is BaseStrategy {
     bool public forceMigrate;
     bool public withdrawChecks;
 
-    bool public splitCompDistribution;
-
     constructor(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) public BaseStrategy(_vault) {
         _initializeThis(_cToken, _router, _comp, _comptroller, _secondsPerBlock);
     }
@@ -99,8 +97,6 @@ contract Strategy is BaseStrategy {
         minCompToSell = 50 ether; //may need to be changed depending on what comp is, sonne price is 0,3$, value should be above 1e15
         collateralTarget = 0.71 ether; // change depending on the collateral, for stablecoins it can be heigher
         blocksToLiquidationDangerZone = 46500;
-
-        splitCompDistribution = true; // sonne impl
     }
 
     /*
@@ -122,10 +118,6 @@ contract Strategy is BaseStrategy {
 
     function setForceMigrate(bool _force) external onlyGovernance {
         forceMigrate = _force;
-    }
-
-    function setSplitCompDistribution(bool _split) external management {
-        splitCompDistribution = _split;
     }
 
     function setMinCompToSell(uint256 _minCompToSell) external management {
@@ -262,19 +254,8 @@ contract Strategy is BaseStrategy {
             return 0; // should be impossible to have 0 balance and positive comp accrued
         }
 
-        uint256 distributionPerBlockSupply;
-        uint256 distributionPerBlockBorrow;
-
-        if(splitCompDistribution){
-            distributionPerBlockSupply = compound.compSupplySpeeds(address(cToken));
-            distributionPerBlockBorrow = compound.compBorrowSpeeds(address(cToken));
-
-        }else{
-            //pre 062 forks
-            distributionPerBlockSupply = compound.compSpeeds(address(cToken));
-            distributionPerBlockBorrow = distributionPerBlockSupply;
-            
-        }
+        uint256 distributionPerBlockSupply = compound.compSupplySpeeds(address(cToken));
+        uint256 distributionPerBlockBorrow = compound.compBorrowSpeeds(address(cToken));
 
         uint256 totalBorrow = cToken.totalBorrows();
 
