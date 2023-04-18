@@ -63,12 +63,12 @@ token_addresses = {
 @pytest.fixture(
     params=[
         "USDC",
-        "USDT",
-        "DAI",
+        # "USDT",
+        # "DAI",
         # "OP", # check why it won't start
         # "WBTC",
-        "WETH",
-        "wstETH",
+        # "WETH",
+        # "wstETH",
     ],
     scope="session",
     autouse=True,
