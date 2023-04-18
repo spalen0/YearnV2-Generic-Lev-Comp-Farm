@@ -45,9 +45,7 @@ contract Strategy is BaseStrategy {
     bool public isVeloWantStable;
 
     uint256 public iterations; //number of loops we do
-
     bool public forceMigrate;
-    bool public withdrawChecks;
 
     constructor(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) public BaseStrategy(_vault) {
         _initializeThis(_cToken, _router, _comp, _comptroller, _secondsPerBlock);
@@ -95,11 +93,6 @@ contract Strategy is BaseStrategy {
     /*
      * Control Functions
      */
-
-    function setWithdrawChecks(bool _withdrawChecks) external management {
-        withdrawChecks = _withdrawChecks;
-    }
-
     function setDontClaimComp(bool _dontClaimComp) external management {
         dontClaimComp = _dontClaimComp;
     }
@@ -560,9 +553,6 @@ contract Strategy is BaseStrategy {
             uint256 diff = _amountNeeded.sub(_amountFreed);
             if (diff > minWant) {
                 _loss = diff;
-            }
-            if (withdrawChecks) {
-                require(_amountNeeded == _amountFreed.add(_loss)); // dev: fourThreeProtection
             }
         }
     }

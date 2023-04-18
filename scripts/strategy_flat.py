@@ -1,6 +1,6 @@
-from brownie import Strategy
+from brownie import LevCompFactory
 
 def main():
-    with open('Strategy.sol', 'w') as f:
-        Strategy.get_verification_info()
-        f.write(Strategy._flattener.flattened_source)
+    with open('LevCompFactory.sol', 'w') as f:
+        LevCompFactory.get_verification_info()
+        f.write(LevCompFactory._flattener.flattened_source)
