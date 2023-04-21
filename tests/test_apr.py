@@ -42,6 +42,7 @@ def test_apr(
     strategy.setMinCompToSell(1e15, {"from": gov})
     # enormousrunningstrategy.setMinWant(0, {"from": gov})
     # assert enormousrunningstrategy.minCompToSell() == 1
+    chain.sleep(1)
     strategy.harvest({"from": gov})
     chain.sleep(21600)
 

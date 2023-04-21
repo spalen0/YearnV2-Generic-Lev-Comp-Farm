@@ -3,17 +3,11 @@ pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
 import {BaseStrategy, StrategyParams, VaultAPI} from "@yearnvaults/contracts/BaseStrategy.sol";
-
-import "./Interfaces/Velodrome/IVelodromeRouter.sol";
-
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/math/Math.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-
 import "./Interfaces/Compound/CErc20I.sol";
 import "./Interfaces/Compound/ComptrollerI.sol";
+import "./Interfaces/Velodrome/IVelodromeRouter.sol";
 
 interface IERC20Extended is IERC20 {
     function decimals() external view returns (uint8);
@@ -24,9 +18,6 @@ interface IERC20Extended is IERC20 {
 }
 
 contract Strategy is BaseStrategy {
-    using SafeERC20 for IERC20;
-    using Address for address;
-    using SafeMath for uint256;
 
     address private constant USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
     address private constant WETH = 0x4200000000000000000000000000000000000006;
@@ -54,9 +45,7 @@ contract Strategy is BaseStrategy {
     bool public isVeloWantStable;
 
     uint256 public iterations; //number of loops we do
-
     bool public forceMigrate;
-    bool public withdrawChecks;
 
     constructor(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) public BaseStrategy(_vault) {
         _initializeThis(_cToken, _router, _comp, _comptroller, _secondsPerBlock);
@@ -77,6 +66,7 @@ contract Strategy is BaseStrategy {
 
     function _initializeThis(address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) internal {
         cToken = CErc20I(_cToken);
+        require(cToken.underlying() == address(want), "Wrong underlying");
         comp = _comp;
         secondsPerBlock = _secondsPerBlock;
         compound = ComptrollerI(_comptroller);
@@ -103,11 +93,6 @@ contract Strategy is BaseStrategy {
     /*
      * Control Functions
      */
-
-    function setWithdrawChecks(bool _withdrawChecks) external management {
-        withdrawChecks = _withdrawChecks;
-    }
-
     function setDontClaimComp(bool _dontClaimComp) external management {
         dontClaimComp = _dontClaimComp;
     }
@@ -569,10 +554,6 @@ contract Strategy is BaseStrategy {
             if (diff <= minWant) {
                 _loss = diff;
             }
-        }
-
-        if (withdrawChecks) {
-            require(_amountNeeded == _amountFreed.add(_loss)); // dev: fourThreeProtection
         }
     }
 

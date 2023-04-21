@@ -37,7 +37,7 @@ def test_profitable_harvest(
     assert vault.strategies(strategy).dict()["totalDebt"] + profit > amount
     assert vault.pricePerShare() > before_pps
 
-    vault.withdraw({"from": user})
+    tx = vault.withdraw({"from": user})
 
 
 # tests harvesting a strategy that reports losses
