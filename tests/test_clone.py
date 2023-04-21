@@ -46,6 +46,7 @@ def test_clone(
 
     while strategy.estimatedTotalAssets() > strategy.minWant():
         strategy.setDoHealthCheck(False, {"from": gov})
+        utils.sleep(1)
         strategy.harvest({"from": gov})
         utils.sleep(1)
         print(f"TA: {strategy.estimatedTotalAssets()}")

@@ -57,6 +57,7 @@ token_addresses = {
     "WBTC": "0x68f180fcce6836688e9084f035309e29bf0a2095",
     "WETH": "0x4200000000000000000000000000000000000006",
     "wstETH": "0x1f32b1c2345538c0c6f582fcb022739c4a194ebb",
+    "sUSD": "0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9",
 }
 
 # TODO: uncomment those tokens you want to test as want
@@ -65,10 +66,10 @@ token_addresses = {
         "USDC",
         "USDT",
         "DAI",
-        # "OP", # check why it won't start
+        "OP",
         # "WBTC",
         "WETH",
-        "wstETH",
+        "sUSD",
     ],
     scope="session",
     autouse=True,
@@ -85,6 +86,7 @@ cToken_addresses = {
     "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
     "WETH": "0xf7B5965f5C117Eb1B5450187c9DcFccc3C317e8E",
     "wstETH": "0x26AaB17f27CD1c8d06a0Ad8E4a1Af8B1032171d5",
+    "sUSD": "0xd14451E0Fa44B18f08aeB1E4a4d092B823CaCa68",
 }
 
 
@@ -101,6 +103,7 @@ whale_addresses = {
     "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
     "WETH": "0x6202a3b0be1d222971e93aab084c6e584c29db70",
     "wstETH": "0xc6c1e8399c1c33a3f1959f2f77349d74a373345c",
+    "sUSD": "0x061b87122ed14b9526a813209c8a59a633257bab",
 }
 
 
@@ -117,6 +120,7 @@ cToken_whale_addresses = {
     "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
     "WETH": "0x6202a3b0be1d222971e93aab084c6e584c29db70",
     "wstETH": "0x53b6fe8c6fa6b95119853f2929c8c6d61f437236",
+    "sUSD": "0x418c0fc22d28f232fddaee148b38e5df38674abf",
 }
 
 
@@ -149,6 +153,7 @@ token_prices = {
     "WBTC": 24_000,
     "WETH": 1_800,
     "wstETH": 1_800,
+    "sUSD": 1,
 }
 
 
@@ -225,6 +230,7 @@ min_want_values = {
     "WBTC": 1e3,
     "WETH": 1e14,
     "wstETH": 1e13,
+    "sUSD": 1e18,
 }
 
 collateral_target_values = {
@@ -235,6 +241,7 @@ collateral_target_values = {
     "WBTC": 55,
     "WETH": 71,
     "wstETH": 50,
+    "sUSD": 50,
 }
 
 
@@ -251,6 +258,7 @@ velo_want_stable_values = {
     "WBTC": False,
     "WETH": False,
     "wstETH": False,
+    "sUSD": True,
 }
 
 @pytest.fixture
