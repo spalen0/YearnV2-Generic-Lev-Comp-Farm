@@ -32,6 +32,9 @@ def test_restricted_fn_user(strategy, user):
 
     with reverts("!authorized"):
         strategy.setIsVeloWantStable(True, {"from": user})
+
+    with reverts("!authorized"):
+        strategy.setBlocksToLiquidationDangerZone(1, {"from": user})
     # NO FUNCTIONS THAT CHANGE STRATEGY BEHAVIOR SHOULD BE CALLABLE FROM A USER
     # thus, this may not be used
     # TODO: add all the external functions that should be callably by a user (if any)
@@ -49,6 +52,9 @@ def test_restricted_fn_management(strategy, management):
 
     with reverts("!authorized"):
         strategy.setForceMigrate(False, {"from": management})
+
+    with reverts("!authorized"):
+        strategy.setBlocksToLiquidationDangerZone(1, {"from": management})
 
     # Functions that are required to unwind a strategy should go be callable by management
     # TODO: add all the external functions that should be callably by management (if any)
