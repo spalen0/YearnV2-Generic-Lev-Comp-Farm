@@ -2360,7 +2360,7 @@ contract Strategy is BaseStrategy {
         // when we return the amountRequested minus dust, take a dust sized loss
         if (_amountFreed < _amountNeeded) {
             uint256 diff = _amountNeeded.sub(_amountFreed);
-            if (diff > minWant) {
+            if (diff <= minWant) {
                 _loss = diff;
             }
         }
