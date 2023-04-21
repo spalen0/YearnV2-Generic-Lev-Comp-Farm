@@ -67,7 +67,7 @@ token_addresses = {
         "USDT",
         "DAI",
         "OP",
-        # "WBTC",
+        # "WBTC", # WBTC is missing liquidity on Velodrome
         "WETH",
         "sUSD",
     ],

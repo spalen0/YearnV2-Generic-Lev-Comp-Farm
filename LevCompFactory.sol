@@ -1843,7 +1843,7 @@ contract Strategy is BaseStrategy {
     IVelodromeRouter public currentRouter; // velodrome router only
 
     uint256 public collateralTarget; // total borrow / total supply ratio we are targeting (100% = 1e18)
-    uint256 private blocksToLiquidationDangerZone; // minimum number of blocks before liquidation
+    uint256 public blocksToLiquidationDangerZone; // minimum number of blocks before liquidation
 
     uint256 public minWant; // minimum amount of want to act on
 
@@ -1896,12 +1896,16 @@ contract Strategy is BaseStrategy {
         minWant = uint256(uint256(10)**uint256((IERC20Extended(address(want))).decimals())).div(1e5);
         minCompToSell = 50 ether; //may need to be changed depending on what comp is, sonne price is 0,3$, value should be above 1e15
         collateralTarget = 0.71 ether; // change depending on the collateral, for stablecoins it can be heigher
-        blocksToLiquidationDangerZone = 46500;
+        blocksToLiquidationDangerZone = 604800 / secondsPerBlock; // time until liquidation zone should be 1 week
     }
 
     /*
      * Control Functions
      */
+    function setBlocksToLiquidationDangerZone(uint256 _blocksToLiquidationDangerZone) external onlyGovernance {
+        blocksToLiquidationDangerZone = _blocksToLiquidationDangerZone;
+    }
+
     function setDontClaimComp(bool _dontClaimComp) external management {
         dontClaimComp = _dontClaimComp;
     }

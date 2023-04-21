@@ -97,10 +97,6 @@ contract Strategy is BaseStrategy {
         blocksToLiquidationDangerZone = _blocksToLiquidationDangerZone;
     }
 
-    function setWithdrawChecks(bool _withdrawChecks) external management {
-        withdrawChecks = _withdrawChecks;
-    }
-
     function setDontClaimComp(bool _dontClaimComp) external management {
         dontClaimComp = _dontClaimComp;
     }
