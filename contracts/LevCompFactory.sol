@@ -13,12 +13,13 @@ contract LevCompFactory {
     constructor(
         address _vault,
         address _cToken,
-        address _router, 
+        address _router,
+        address _poolFactory, 
         address _comp, 
         address _comptroller, 
         uint256 _secondsPerBlock
     ) public {
-        Strategy _original = new Strategy(_vault, _cToken, _router, _comp, _comptroller, _secondsPerBlock);
+        Strategy _original = new Strategy(_vault, _cToken, _router, _poolFactory, _comp, _comptroller, _secondsPerBlock);
         emit Deployed(address(_original));
 
         original = address(_original);
@@ -32,7 +33,8 @@ contract LevCompFactory {
     function cloneLevComp(
         address _vault,
         address _cToken,
-        address _router, 
+        address _router,
+        address _poolFactory,
         address _comp, 
         address _comptroller, 
         uint256 _secondsPerBlock
@@ -54,7 +56,7 @@ contract LevCompFactory {
             newStrategy := create(0, clone_code, 0x37)
         }
 
-        Strategy(newStrategy).initialize(_vault, _cToken, _router, _comp, _comptroller, _secondsPerBlock);
+        Strategy(newStrategy).initialize(_vault, _cToken, _router, _poolFactory, _comp, _comptroller, _secondsPerBlock);
         Strategy(newStrategy).setRewards(msg.sender);
         Strategy(newStrategy).setStrategist(msg.sender);
     

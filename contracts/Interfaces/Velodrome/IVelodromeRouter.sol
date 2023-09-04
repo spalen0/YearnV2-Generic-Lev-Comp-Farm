@@ -4,58 +4,45 @@ pragma experimental ABIEncoderV2;
 
 interface IVelodromeRouter {
 
-    struct route {
+    struct Route {
         address from;
         address to;
         bool stable;
+        address factory;
     }
 
     function sortTokens(address tokenA, address tokenB) external pure returns (address token0, address token1);
 
     // calculates the CREATE2 address for a pair without making any external calls
-    function pairFor(address tokenA, address tokenB, bool stable) external view returns (address pair);
+    /// @notice Wraps around poolFor(tokenA,tokenB,stable,_factory) for backwards compatibility to Velodrome v1
+    function pairFor(address tokenA, address tokenB, bool stable, address _factory) external view returns (address pool);
 
     // fetches and sorts the reserves for a pair
-    function getReserves(address tokenA, address tokenB, bool stable) external view returns (uint reserveA, uint reserveB);
+    function getReserves(address tokenA, address tokenB, bool stable, address _factory) external view returns (uint reserveA, uint reserveB);
 
     // performs chained getAmountOut calculations on any number of pairs
-    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amount, bool stable);
-
-    // performs chained getAmountOut calculations on any number of pairs
-    function getAmountsOut(uint amountIn, route[] memory routes) external view returns (uint[] memory amounts);
-
-    function isPair(address pair) external view returns (bool);
-
-    function swapExactTokensForTokensSimple(
-        uint amountIn,
-        uint amountOutMin,
-        address tokenFrom,
-        address tokenTo,
-        bool stable,
-        address to,
-        uint deadline
-    ) external returns (uint[] memory amounts);
+    function getAmountsOut(uint amountIn, Route[] memory routes) external view returns (uint[] memory amounts);
 
     function swapExactTokensForTokens(
         uint amountIn,
         uint amountOutMin,
-        route[] calldata routes,
+        Route[] calldata routes,
         address to,
         uint deadline
     ) external returns (uint[] memory amounts);
 
-    function swapExactETHForTokens(uint amountOutMin, route[] calldata routes, address to, uint deadline)
+    function swapExactETHForTokens(uint amountOutMin, Route[] calldata routes, address to, uint deadline)
         external
         payable
         returns (uint[] memory amounts);
 
-    function swapExactTokensForETH(uint amountIn, uint amountOutMin, route[] calldata routes, address to, uint deadline)
+    function swapExactTokensForETH(uint amountIn, uint amountOutMin, Route[] calldata routes, address to, uint deadline)
         external
         returns (uint[] memory amounts);
 
     function UNSAFE_swapExactTokensForTokens(
         uint[] memory amounts,
-        route[] calldata routes,
+        Route[] calldata routes,
         address to,
         uint deadline
     ) external returns (uint[] memory);

@@ -28,6 +28,7 @@ contract Strategy is BaseStrategy {
     //Only three tokens we use
     address public comp;
     CErc20I public cToken;
+    address poolFactory;
 
     uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum, Sonne uses 1 block per second for caluclations
 
@@ -47,8 +48,8 @@ contract Strategy is BaseStrategy {
     uint256 public iterations; //number of loops we do
     bool public forceMigrate;
 
-    constructor(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) public BaseStrategy(_vault) {
-        _initializeThis(_cToken, _router, _comp, _comptroller, _secondsPerBlock);
+    constructor(address _vault, address _cToken, address _router, address _poolFactory, address _comp, address _comptroller, uint256 _secondsPerBlock) public BaseStrategy(_vault) {
+        _initializeThis(_cToken, _router, _poolFactory, _comp, _comptroller, _secondsPerBlock);
     }
 
     function approveTokenMax(address token, address spender) internal {
@@ -59,12 +60,12 @@ contract Strategy is BaseStrategy {
         return "GenLevSonneNoFlash";
     }
 
-    function initialize(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) external {
+    function initialize(address _vault, address _cToken, address _router, address _poolFactory, address _comp, address _comptroller, uint256 _secondsPerBlock) external {
         _initialize(_vault, msg.sender, msg.sender, msg.sender);
-        _initializeThis(_cToken, _router, _comp, _comptroller, _secondsPerBlock);
+        _initializeThis(_cToken, _router, _poolFactory, _comp, _comptroller, _secondsPerBlock);
     }
 
-    function _initializeThis(address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock) internal {
+    function _initializeThis(address _cToken, address _router,  address _poolFactory, address _comp, address _comptroller, uint256 _secondsPerBlock) internal {
         cToken = CErc20I(_cToken);
         require(cToken.underlying() == address(want), "Wrong underlying");
         comp = _comp;
@@ -72,6 +73,7 @@ contract Strategy is BaseStrategy {
         compound = ComptrollerI(_comptroller);
         require(IERC20Extended(address(want)).decimals() <= 18); // dev: want not supported
         currentRouter = IVelodromeRouter(_router);
+        poolFactory = _poolFactory;
 
         //pre-set approvals
         approveTokenMax(comp, address(currentRouter));
@@ -582,16 +584,16 @@ contract Strategy is BaseStrategy {
 
     }
 
-    function getTokenOutPathV2(address _tokenIn, address _tokenOut) internal view returns (IVelodromeRouter.route[] memory _path) {
+    function getTokenOutPathV2(address _tokenIn, address _tokenOut) internal view returns (IVelodromeRouter.Route[] memory _path) {
         address swapToken = isWethSwap ? WETH : USDC;
         bool isSwapToken = _tokenOut == swapToken;
         _path = new IVelodromeRouter.route[](isSwapToken ? 1 : 2);
 
         if (isSwapToken) {
-            _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false);
+            _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false, poolFactory);
         } else {
-            _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false);
-            _path[1] = IVelodromeRouter.route(swapToken, _tokenOut, isVeloWantStable && !isWethSwap);
+            _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false, poolFactory);
+            _path[1] = IVelodromeRouter.route(swapToken, _tokenOut, isVeloWantStable && !isWethSwap, poolFactory);
         }
     }
 
