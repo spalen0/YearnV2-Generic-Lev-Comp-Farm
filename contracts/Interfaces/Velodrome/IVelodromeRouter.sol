@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 interface IVelodromeRouter {
 
-    struct Route {
+    struct route {
         address from;
         address to;
         bool stable;
@@ -21,28 +21,28 @@ interface IVelodromeRouter {
     function getReserves(address tokenA, address tokenB, bool stable, address _factory) external view returns (uint reserveA, uint reserveB);
 
     // performs chained getAmountOut calculations on any number of pairs
-    function getAmountsOut(uint amountIn, Route[] memory routes) external view returns (uint[] memory amounts);
+    function getAmountsOut(uint amountIn, route[] memory routes) external view returns (uint[] memory amounts);
 
     function swapExactTokensForTokens(
         uint amountIn,
         uint amountOutMin,
-        Route[] calldata routes,
+        route[] calldata routes,
         address to,
         uint deadline
     ) external returns (uint[] memory amounts);
 
-    function swapExactETHForTokens(uint amountOutMin, Route[] calldata routes, address to, uint deadline)
+    function swapExactETHForTokens(uint amountOutMin, route[] calldata routes, address to, uint deadline)
         external
         payable
         returns (uint[] memory amounts);
 
-    function swapExactTokensForETH(uint amountIn, uint amountOutMin, Route[] calldata routes, address to, uint deadline)
+    function swapExactTokensForETH(uint amountIn, uint amountOutMin, route[] calldata routes, address to, uint deadline)
         external
         returns (uint[] memory amounts);
 
     function UNSAFE_swapExactTokensForTokens(
         uint[] memory amounts,
-        Route[] calldata routes,
+        route[] calldata routes,
         address to,
         uint deadline
     ) external returns (uint[] memory);

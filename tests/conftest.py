@@ -193,9 +193,12 @@ def sonne(interface):
 
 @pytest.fixture
 def velodrome_router(interface):
-    token_address = "0x9c12939390052919aF3155f41Bf4160Fd3666A6f"
+    token_address = "0xa062aE8A9c5e11aaA026fc2670B0D65cCc8B2858"
     yield interface.IVelodromeRouter(token_address)
 
+@pytest.fixture
+def velodrome_pool_factory():
+    yield "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
 
 @pytest.fixture
 def weth_amount(user, weth):
@@ -275,13 +278,14 @@ def strategy(
     gov,
     cToken,
     velodrome_router,
+    velodrome_pool_factory,
     sonne,
     sonne_comptroller,
     token,
     collateral_target,
 ):
     strategy = strategist.deploy(
-        Strategy, vault, cToken, velodrome_router, sonne, sonne_comptroller, 1
+        Strategy, vault, cToken, velodrome_router, velodrome_pool_factory, sonne, sonne_comptroller, 1
     )
     strategy.setKeeper(keeper)
     strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
@@ -299,6 +303,7 @@ def factory(
     strategist,
     gov,
     velodrome_router,
+    velodrome_pool_factory,
     sonne,
     sonne_comptroller,
 ):
@@ -307,6 +312,7 @@ def factory(
         vault,
         cToken,
         velodrome_router,
+        velodrome_pool_factory,
         sonne,
         sonne_comptroller,
         1,
