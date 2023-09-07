@@ -90,9 +90,6 @@ contract Strategy is BaseStrategy {
         minCompToSell = 50 ether; //may need to be changed depending on what comp is, sonne price is 0,3$, value should be above 1e15
         collateralTarget = 0.71 ether; // change depending on the collateral, for stablecoins it can be heigher
         blocksToLiquidationDangerZone = 604800 / secondsPerBlock; // time until liquidation zone should be 1 week
-
-        // (, uint256 collateralFactorMantissa, ) = compound.markets(address(cToken));
-        // collateralTarget = collateralFactorMantissa.sub(0.02 ether);
     }
 
     /*
