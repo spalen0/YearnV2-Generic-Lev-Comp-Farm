@@ -101,7 +101,7 @@ whale_addresses = {
     "DAI": "0xad32aa4bff8b61b4ae07e3ba437cf81100af0cd7",
     "OP": "0x2a82ae142b2e62cb7d10b55e323acb1cab663a26",
     "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
-    "WETH": "0x6202a3b0be1d222971e93aab084c6e584c29db70",
+    "WETH": "0x85149247691df622eaf1a8bd0cafd40bc45154a9",
     "wstETH": "0xc6c1e8399c1c33a3f1959f2f77349d74a373345c",
     "sUSD": "0x061b87122ed14b9526a813209c8a59a633257bab",
 }
