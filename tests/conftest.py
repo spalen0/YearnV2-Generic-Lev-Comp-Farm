@@ -67,7 +67,7 @@ token_addresses = {
         "USDT",
         "DAI",
         "OP",
-        # "WBTC", # WBTC is missing liquidity on Velodrome
+        "WBTC",
         "WETH",
         "sUSD",
     ],
@@ -196,9 +196,6 @@ def velodrome_router(interface):
     token_address = "0xa062aE8A9c5e11aaA026fc2670B0D65cCc8B2858"
     yield interface.IVelodromeRouter(token_address)
 
-@pytest.fixture
-def velodrome_pool_factory():
-    yield "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
 
 @pytest.fixture
 def weth_amount(user, weth):
@@ -270,6 +267,129 @@ def velo_want_stable(token):
 
 
 @pytest.fixture
+def velodrome_route(token):
+    yield velodrome_route_values[token.symbol()]
+
+
+velodrome_route_values = {
+    "USDT": [[
+                "0x1DB2466d9F5e10D7090E7152B68d62703a2245F0",
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
+                1,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ]],
+
+    "USDC": [[
+                "0x1DB2466d9F5e10D7090E7152B68d62703a2245F0",
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ]],
+
+    "DAI": [[
+                "0x1DB2466d9F5e10D7090E7152B68d62703a2245F0",
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+                1,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ]],
+
+    "OP": [[
+                "0x1DB2466d9F5e10D7090E7152B68d62703a2245F0",
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+                "0x4200000000000000000000000000000000000042",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ]],
+
+    "WBTC": [[
+                "0x1DB2466d9F5e10D7090E7152B68d62703a2245F0",
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                "0x68f180fcCe6836688e9084f035309E29Bf0A2095",
+                0,
+                "0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746"
+            ]],
+
+    "WETH": [[
+                "0x1DB2466d9F5e10D7090E7152B68d62703a2245F0",
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                "0x9e1028F5F1D5eDE59748FFceE5532509976840E0",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0x9e1028F5F1D5eDE59748FFceE5532509976840E0",
+                "0x4200000000000000000000000000000000000006",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ]],
+
+    "wstETH": [[
+                "0x1DB2466d9F5e10D7090E7152B68d62703a2245F0",
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ]],
+
+    "sUSD": [[
+                "0x1DB2466d9F5e10D7090E7152B68d62703a2245F0",
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                0,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+                "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+                1,
+                "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a"
+            ],
+            [
+                "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+                "0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9",
+                1,
+                "0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746"
+            ]],
+}
+
+@pytest.fixture
 def strategy(
     strategist,
     keeper,
@@ -278,14 +398,14 @@ def strategy(
     gov,
     cToken,
     velodrome_router,
-    velodrome_pool_factory,
     sonne,
     sonne_comptroller,
+    velodrome_route,
     token,
     collateral_target,
 ):
     strategy = strategist.deploy(
-        Strategy, vault, cToken, velodrome_router, velodrome_pool_factory, sonne, sonne_comptroller, 1
+        Strategy, vault, cToken, velodrome_router, sonne, sonne_comptroller, 1, velodrome_route
     )
     strategy.setKeeper(keeper)
     strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
@@ -303,19 +423,19 @@ def factory(
     strategist,
     gov,
     velodrome_router,
-    velodrome_pool_factory,
     sonne,
     sonne_comptroller,
+    velodrome_route,
 ):
     factory = strategist.deploy(
         LevCompFactory,
         vault,
         cToken,
         velodrome_router,
-        velodrome_pool_factory,
         sonne,
         sonne_comptroller,
         1,
+        velodrome_route,
     )
     yield factory
 

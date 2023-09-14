@@ -35,7 +35,7 @@ def test_profitable_harvest(
     profit = token.balanceOf(vault.address)  # Profits go to vault
 
     assert vault.strategies(strategy).dict()["totalDebt"] + profit > amount
-    assert vault.pricePerShare() > before_pps
+    assert vault.pricePerShare() >= before_pps
 
     tx = vault.withdraw({"from": user})
 

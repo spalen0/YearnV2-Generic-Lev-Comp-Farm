@@ -28,7 +28,6 @@ contract Strategy is BaseStrategy {
     //Only three tokens we use
     address public comp;
     CErc20I public cToken;
-    address poolFactory;
 
     uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum, Sonne uses 1 block per second for caluclations
 
@@ -48,8 +47,10 @@ contract Strategy is BaseStrategy {
     uint256 public iterations; //number of loops we do
     bool public forceMigrate;
 
-    constructor(address _vault, address _cToken, address _router, address _poolFactory, address _comp, address _comptroller, uint256 _secondsPerBlock) public BaseStrategy(_vault) {
-        _initializeThis(_cToken, _router, _poolFactory, _comp, _comptroller, _secondsPerBlock);
+    IVelodromeRouter.route[] public sellRewardsRoute;
+
+    constructor(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock, IVelodromeRouter.route[] memory _routes) public BaseStrategy(_vault) {
+        _initializeThis(_cToken, _router, _comp, _comptroller, _secondsPerBlock, _routes);
     }
 
     function approveTokenMax(address token, address spender) internal {
@@ -60,12 +61,12 @@ contract Strategy is BaseStrategy {
         return "GenLevSonneNoFlash";
     }
 
-    function initialize(address _vault, address _cToken, address _router, address _poolFactory, address _comp, address _comptroller, uint256 _secondsPerBlock) external {
+    function initialize(address _vault, address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock, IVelodromeRouter.route[] memory _routes) external {
         _initialize(_vault, msg.sender, msg.sender, msg.sender);
-        _initializeThis(_cToken, _router, _poolFactory, _comp, _comptroller, _secondsPerBlock);
+        _initializeThis(_cToken, _router, _comp, _comptroller, _secondsPerBlock, _routes);
     }
 
-    function _initializeThis(address _cToken, address _router,  address _poolFactory, address _comp, address _comptroller, uint256 _secondsPerBlock) internal {
+    function _initializeThis(address _cToken, address _router, address _comp, address _comptroller, uint256 _secondsPerBlock, IVelodromeRouter.route[] memory _routes) internal {
         cToken = CErc20I(_cToken);
         require(cToken.underlying() == address(want), "Wrong underlying");
         comp = _comp;
@@ -73,7 +74,6 @@ contract Strategy is BaseStrategy {
         compound = ComptrollerI(_comptroller);
         require(IERC20Extended(address(want)).decimals() <= 18); // dev: want not supported
         currentRouter = IVelodromeRouter(_router);
-        poolFactory = _poolFactory;
 
         //pre-set approvals
         approveTokenMax(comp, address(currentRouter));
@@ -87,9 +87,13 @@ contract Strategy is BaseStrategy {
 
         // set minWant to 1e-5 want
         minWant = uint256(uint256(10)**uint256((IERC20Extended(address(want))).decimals())).div(1e5);
-        minCompToSell = 50 ether; //may need to be changed depending on what comp is, sonne price is 0,3$, value should be above 1e15
+        minCompToSell = 100 ether; //may need to be changed depending on what comp is, sonne price is 0,3$, value should be above 1e15
         collateralTarget = 0.71 ether; // change depending on the collateral, for stablecoins it can be heigher
         blocksToLiquidationDangerZone = 604800 / secondsPerBlock; // time until liquidation zone should be 1 week
+
+        for (uint i = 0; i < _routes.length; i++) {
+            sellRewardsRoute.push(_routes[i]);
+        }
     }
 
     /*
@@ -211,7 +215,7 @@ contract Strategy is BaseStrategy {
             return _amount;
         }
 
-        uint256[] memory amounts = currentRouter.getAmountsOut(_amount, getTokenOutPathV2(start, end));
+        uint256[] memory amounts = currentRouter.getAmountsOut(_amount, sellRewardsRoute);
 
         return amounts[amounts.length - 1];
         
@@ -580,20 +584,14 @@ contract Strategy is BaseStrategy {
             return;
         }
 
-        currentRouter.swapExactTokensForTokens(_comp, 0, getTokenOutPathV2(comp, address(want)), address(this), now);
+        currentRouter.swapExactTokensForTokens(_comp, 0, sellRewardsRoute, address(this), now);
 
     }
 
-    function getTokenOutPathV2(address _tokenIn, address _tokenOut) internal view returns (IVelodromeRouter.route[] memory _path) {
-        address swapToken = isWethSwap ? WETH : USDC;
-        bool isSwapToken = _tokenOut == swapToken;
-        _path = new IVelodromeRouter.route[](isSwapToken ? 1 : 2);
-
-        if (isSwapToken) {
-            _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false, poolFactory);
-        } else {
-            _path[0] = IVelodromeRouter.route(_tokenIn, swapToken, false, poolFactory);
-            _path[1] = IVelodromeRouter.route(swapToken, _tokenOut, isVeloWantStable && !isWethSwap, poolFactory);
+    function setSellRewardsRoute(IVelodromeRouter.route[] memory _routes) external onlyVaultManagers {
+        delete sellRewardsRoute; // clear the array
+        for (uint256 i = 0; i < _routes.length; i++) {
+            sellRewardsRoute.push(_routes[i]);
         }
     }
 
