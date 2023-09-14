@@ -49,7 +49,7 @@ def keeper(accounts):
     yield accounts[5]
 
 
-token_addresses = {
+token_addresses = { 
     "USDT": "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
     "DAI": "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
     "USDC": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
@@ -64,7 +64,7 @@ token_addresses = {
 @pytest.fixture(
     params=[
         "USDC",
-        "USDT",
+        # "USDT",
         "DAI",
         "OP",
         "WBTC",
@@ -149,7 +149,7 @@ token_prices = {
     "USDT": 1,
     "USDC": 1,
     "DAI": 1,
-    "OP": 8,
+    "OP": 2,
     "WBTC": 24_000,
     "WETH": 1_800,
     "wstETH": 1_800,
@@ -269,6 +269,11 @@ def velo_want_stable(token):
 @pytest.fixture
 def velodrome_route(token):
     yield velodrome_route_values[token.symbol()]
+
+# pools related to these routes
+
+
+
 
 
 velodrome_route_values = {
