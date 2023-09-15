@@ -51,7 +51,7 @@ def keeper(accounts):
 
 token_addresses = { 
     "USDT": "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
-    "DAI": "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+    "DAI": "0x1eed63efba5f81d95bfe37d82c8e736b974f477b",
     "USDC": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
     "OP": "0x4200000000000000000000000000000000000042",
     "WBTC": "0x68f180fcce6836688e9084f035309e29bf0a2095",
