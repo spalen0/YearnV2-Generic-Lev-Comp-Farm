@@ -51,7 +51,7 @@ def keeper(accounts):
 
 token_addresses = { 
     "USDT": "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
-    "DAI": "0x1eed63efba5f81d95bfe37d82c8e736b974f477b",
+    "DAI": "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
     "USDC": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
     "OP": "0x4200000000000000000000000000000000000042",
     "WBTC": "0x68f180fcce6836688e9084f035309e29bf0a2095",
@@ -98,7 +98,7 @@ def cToken(token):
 whale_addresses = {
     "USDC": "0xebe80f029b1c02862b9e8a70a7e5317c06f62cae",
     "USDT": "0x0d0707963952f2fba59dd06f2b425ace40b492fe",
-    "DAI": "0xad32aa4bff8b61b4ae07e3ba437cf81100af0cd7",
+    "DAI": "0x1eed63efba5f81d95bfe37d82c8e736b974f477b",
     "OP": "0x2a82ae142b2e62cb7d10b55e323acb1cab663a26",
     "WBTC": "0x33865e09a572d4f1cc4d75afc9abcc5d3d4d867d",
     "WETH": "0x85149247691df622eaf1a8bd0cafd40bc45154a9",
