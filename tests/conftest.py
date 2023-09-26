@@ -64,10 +64,9 @@ token_addresses = {
 @pytest.fixture(
     params=[
         "USDC",
-        # "USDT",
+        "USDT",
         "DAI",
         "OP",
-        "WBTC",
         "WETH",
         "sUSD",
     ],

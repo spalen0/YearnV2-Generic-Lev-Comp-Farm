@@ -17,6 +17,10 @@ interface IERC20Extended is IERC20 {
     function symbol() external view returns (string memory);
 }
 
+interface IEthToWant {
+    function ethToWant(uint256 input) external view returns (uint256);
+}
+
 contract Strategy is BaseStrategy {
 
     address private constant USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
@@ -32,6 +36,7 @@ contract Strategy is BaseStrategy {
     uint256 private secondsPerBlock; //1 for fantom. 13 for ethereum, Sonne uses 1 block per second for caluclations
 
     IVelodromeRouter public currentRouter; // velodrome router only
+    address public ethToWantOracle;
 
     uint256 public collateralTarget; // total borrow / total supply ratio we are targeting (100% = 1e18)
     uint256 public blocksToLiquidationDangerZone; // minimum number of blocks before liquidation
@@ -94,6 +99,10 @@ contract Strategy is BaseStrategy {
         for (uint i = 0; i < _routes.length; i++) {
             sellRewardsRoute.push(_routes[i]);
         }
+    }
+
+    function setPriceOracle(address _oracle) external onlyAuthorized {
+        ethToWantOracle = _oracle;
     }
 
     /*
@@ -164,7 +173,7 @@ contract Strategy is BaseStrategy {
         uint256 currentComp = balanceOfToken(comp);
 
         // Use touch price. it doesnt matter if we are wrong as this is not used for decision making
-        uint256 estimatedWant = priceCheck(comp, address(want), _claimableComp.add(currentComp));
+        uint256 estimatedWant = currentRouter.getAmountsOut(_claimableComp.add(currentComp), sellRewardsRoute)[sellRewardsRoute.length - 1];
         uint256 conservativeWant = estimatedWant.mul(9).div(10); //10% pessimist
 
         return balanceOfToken(address(want)).add(deposits).add(conservativeWant).sub(borrows);
@@ -200,25 +209,6 @@ contract Strategy is BaseStrategy {
         }
 
         return getblocksUntilLiquidation() <= blocksToLiquidationDangerZone;
-    }
-
-    //WARNING. manipulatable and simple routing. Only use for safe functions
-    function priceCheck(
-        address start,
-        address end,
-        uint256 _amount
-    ) public view returns (uint256) {
-        if (_amount == 0) {
-            return 0;
-        }
-        if(start == end){
-            return _amount;
-        }
-
-        uint256[] memory amounts = currentRouter.getAmountsOut(_amount, sellRewardsRoute);
-
-        return amounts[amounts.length - 1];
-        
     }
 
     /*****************
@@ -718,7 +708,11 @@ contract Strategy is BaseStrategy {
     // -- Internal Helper functions -- //
 
     function ethToWant(uint256 _amtInWei) public view override returns (uint256) {
-        return priceCheck(WETH, address(want), _amtInWei);
+        if (ethToWantOracle != address(0)) {
+            return IEthToWant(ethToWantOracle).ethToWant(_amtInWei);
+        } else {
+            return _amtInWei;
+        }
     }
 
     function liquidateAllPositions() internal override returns (uint256 _amountFreed) {
