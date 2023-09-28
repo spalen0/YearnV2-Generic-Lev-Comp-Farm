@@ -173,7 +173,8 @@ contract Strategy is BaseStrategy {
         uint256 currentComp = balanceOfToken(comp);
 
         // Use touch price. it doesnt matter if we are wrong as this is not used for decision making
-        uint256 estimatedWant = currentRouter.getAmountsOut(_claimableComp.add(currentComp), sellRewardsRoute)[sellRewardsRoute.length - 1];
+        uint256[] memory amounts = currentRouter.getAmountsOut(_claimableComp.add(currentComp), sellRewardsRoute);
+        uint256 estimatedWant = amounts[amounts.length - 1];
         uint256 conservativeWant = estimatedWant.mul(9).div(10); //10% pessimist
 
         return balanceOfToken(address(want)).add(deposits).add(conservativeWant).sub(borrows);
