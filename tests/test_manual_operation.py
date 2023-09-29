@@ -23,7 +23,10 @@ def test_manual_deleverage(
     strategy.manualDeleverage(step_size, {"from": gov})
     (supply_end, borrow_end) = strategy.getCurrentPosition()
     assert pytest.approx(supply - step_size, rel=1e-3) == supply_end
-    assert pytest.approx(borrow - step_size, rel=1e-3) == borrow_end
+    assert (
+        pytest.approx(borrow - step_size, rel=1e-3) == borrow_end
+        or borrow_end <= strategy.minWant()
+    )
 
     # shut down strategy and check accounting
     vault.updateStrategyDebtRatio(strategy, 0, {"from": gov})

@@ -21,7 +21,7 @@ def test_operation(
     user_balance_before = token.balanceOf(user)
     actions.user_deposit(user, vault, token, amount)
 
-    strategy.setCollateralTarget(33 * 1e16, {"from": gov})
+    strategy.setCollateralTarget(strategy.collateralTarget() / 2, {"from": gov})
 
     # harvest
     chain.sleep(1)

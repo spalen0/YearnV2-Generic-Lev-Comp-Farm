@@ -236,9 +236,9 @@ collateral_target_values = {
     "USDT": 80,
     "USDC": 80,
     "DAI": 80,
-    "OP": 60,
+    "OP": 0.1,
     "WBTC": 55,
-    "WETH": 71,
+    "WETH": 45,
     "wstETH": 50,
     "sUSD": 50,
 }
@@ -415,6 +415,8 @@ def strategy(
     strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
     strategy.setCollateralTarget(collateral_target, {"from": gov})
     strategy.setIsVeloWantStable(velo_want_stable_values[token.symbol()], {"from": gov})
+    profit_factor_adjustment = token_prices["WETH"] / token_prices[token.symbol()] * 10 ** (18 - token.decimals())
+    strategy.setProfitFactor(strategy.profitFactor() * profit_factor_adjustment, {"from": gov})
     vault.addStrategy(strategy, 10_000, 0, 2**256 - 1, 0, {"from": gov})
     yield strategy
 
