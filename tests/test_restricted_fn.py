@@ -28,12 +28,6 @@ def test_restricted_fn_user(strategy, user):
         strategy.setRouter(ZERO_ADDRESS, {"from": user})
 
     with reverts("!authorized"):
-        strategy.setIsWethSwap(True, {"from": user})
-
-    with reverts("!authorized"):
-        strategy.setIsVeloWantStable(True, {"from": user})
-
-    with reverts("!authorized"):
         strategy.setBlocksToLiquidationDangerZone(1, {"from": user})
     # NO FUNCTIONS THAT CHANGE STRATEGY BEHAVIOR SHOULD BE CALLABLE FROM A USER
     # thus, this may not be used

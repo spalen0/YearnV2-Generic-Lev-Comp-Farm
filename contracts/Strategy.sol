@@ -46,8 +46,6 @@ contract Strategy is BaseStrategy {
     // Rewards handling
     bool public dontClaimComp; // enable/disables COMP claiming
     uint256 public minCompToSell; // minimum amount of COMP to be sold
-    bool public isWethSwap;
-    bool public isVeloWantStable;
 
     uint256 public iterations; //number of loops we do
     bool public forceMigrate;
@@ -88,7 +86,7 @@ contract Strategy is BaseStrategy {
         maxReportDelay = 86400; // once per 24 hours
         profitFactor = 100_000; // multiple before triggering harvest 
         debtThreshold = 1e30;
-        iterations = 6; //standard 6
+        iterations = 20; //standard 20 for Sonne on Optimism
 
         // set minWant to 1e-5 want
         minWant = uint256(uint256(10)**uint256((IERC20Extended(address(want))).decimals())).div(1e5);
@@ -138,25 +136,15 @@ contract Strategy is BaseStrategy {
         minWant = _minWant;
     }
 
-    function setIsWethSwap(bool _isWethSwap) external management {
-        isWethSwap = _isWethSwap;
-    }
-
     function setCollateralTarget(uint256 _collateralTarget) external management {
         (, uint256 collateralFactorMantissa, ) = compound.markets(address(cToken));
         require(collateralFactorMantissa > _collateralTarget);
         collateralTarget = _collateralTarget;
     }
 
-    function setIsVeloWantStable(bool _isVeloWantStable) external management {
-        isVeloWantStable = _isVeloWantStable;
-    }
-
-    function setRewardBehavior(uint256 _minCompToSell, bool _dontClaimComp, bool _isWethSwap, bool _isVeloWantStable) external management {
+    function setRewardBehavior(uint256 _minCompToSell, bool _dontClaimComp) external management {
         minCompToSell = _minCompToSell;
         dontClaimComp = _dontClaimComp;
-        isWethSwap = _isWethSwap;
-        isVeloWantStable = _isVeloWantStable;
     }
 
     /*

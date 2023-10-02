@@ -414,7 +414,6 @@ def strategy(
     strategy.setKeeper(keeper)
     strategy.setMinWant(min_want_values[token.symbol()], {"from": gov})
     strategy.setCollateralTarget(collateral_target, {"from": gov})
-    strategy.setIsVeloWantStable(velo_want_stable_values[token.symbol()], {"from": gov})
     profit_factor_adjustment = token_prices["WETH"] / token_prices[token.symbol()] * 10 ** (18 - token.decimals())
     strategy.setProfitFactor(strategy.profitFactor() * profit_factor_adjustment, {"from": gov})
     vault.addStrategy(strategy, 10_000, 0, 2**256 - 1, 0, {"from": gov})
